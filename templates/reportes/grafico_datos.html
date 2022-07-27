@@ -3,23 +3,11 @@
 {% block contenido%}
 <!-- Page Heading -->
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
-    <a href="{% url 'master:index' %}" class="align-self-center ms-2 mb-1 btn btn-primary text-light border"><i
-            class="far fa-arrow-alt-circle-left"></i> Volver al
-        menú</a>
-    <form action="{% url 'reportes:index' %}" method="GET" class="form-inline">
-        <div class="form-group mx-sm-3 mb-2">
-            <label for="fecha_ini" class="me-1">Fecha Inicio: </label>
-            <input type="date" class="form-control" id="fecha_ini" name="fecha_ini" value="{{ fecha_ini }}">
-        </div>
-        <div class="form-group mx-sm-3 mb-2">
-            <label for="fecha_fin" class="me-1">Fecha Fin: </label>
-            <input type="date" class="form-control" id="fecha_fin" name="fecha_fin" value="{{ fecha_fin }}">
-        </div>
-        <button type="submit" class="btn btn-primary mb-2">Buscar</button>
-    </form>
+    <a href="{% url 'reportes:index' %}" class="align-self-center ms-2 mb-1 btn btn-primary text-light border"><i
+            class="far fa-arrow-alt-circle-left"></i> Volver atrás</a>
 
 </div>
-<div class="row">
+<div class="row justify-content-center">
     <div class="col-xl-12 col-md-12 mb-12">
         <div class="card shadow mb-4">
             <!-- Card Header - Dropdown -->
@@ -28,7 +16,26 @@
             </div>
             <!-- Card Body -->
             <div class="card-body">
-                <div id='jqxChart' style="width: 100%; height: 400px;"></div>
+                {% for parametro in parametros  %}
+                <h2 class="text-center p-2 mt-3 display-3">{{parametro.nombre}}</h2>
+                <div class="row">
+
+                    {% for punto in puntos  %}
+                    <div class="col-xl-4 col-md-6 mb-4">
+                        <div class="card border-left-primary shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <canvas id='jqxChart_{{parametro.id}}_{{punto.id}}'></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                </div>
+                {% endfor %}
             </div>
         </div>
     </div>
@@ -38,130 +45,53 @@
 {% block javascript %}
 
 <script>
-    if ('{{fecha_ini}}' != 'None' && '{{fecha_ini}}' != '') {
-        $('#fecha_ini').val('{{fecha_ini}}');
-    } else {
-        var today = new Date();
-        var dd = today.getDate();
-        var mm = today.getMonth() + 1; //January is 0!
-        var yyyy = today.getFullYear();
+    var datos_json = JSON.parse('{{ datos_json|safe }}');
+    //console.log(datos_json)
+    //crear multiple graficos de barra 
+    //iterar sobre los elementos del json
+    for (var key in datos_json) {
+        //itera sobre los puntos de cada elemento
+        for (var i = 0; i < datos_json[key].length; i++) {
+            console.log(datos_json[key][i])
+            const ctx = document.getElementById(`jqxChart_${key}_${datos_json[key][i].id}`).getContext('2d');
+            var myChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: datos_json[key][i].data.map(function (e) {
+                        return e.fecha
+                    }),
+                    datasets: [{
+                        label: datos_json[key][i].punto,
+                        data: datos_json[key][i].data.map(function (e) {
+                            return e.valor
+                        }),
+                        backgroundColor: [
+                            'rgba(245, 54, 39, 0.8)',
+                            'rgba(12, 24, 233, 0.8)',
+                            'rgba(0, 0, 0, 0.8)',
+                        ],
+                        borderColor: [
+                            'rgba(255, 255, 255, 0.8)',
+                            'rgba(255, 255	, 255, 0.8)',
+                            'rgba(255, 255, 255, 0.8)',
+                        ],
+                        borderWidth: 1
 
-        if (dd < 10) {
-            dd = '0' + dd;
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            ticks: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                }
+
+            });
         }
-
-        if (mm < 10) {
-            mm = '0' + mm;
-        }
-
-        today = yyyy + '-' + mm + '-' + dd;
-        $('#fecha_ini').val(today);
     }
-    //if fecha_fin from request.get form set value to input else set value to today date at 00:00
-    if ('{{fecha_fin}}' != 'None' && '{{fecha_fin}}' != '') {
-        $('#fecha_fin').val('{{fecha_fin}}');
-    } else {
-        var today = new Date();
-        var dd = today.getDate();
-        var mm = today.getMonth() + 1; //January is 0!
-        var yyyy = today.getFullYear();
-
-        if (dd < 10) {
-            dd = '0' + dd;
-        }
-
-        if (mm < 10) {
-            mm = '0' + mm;
-        }
-
-        today = yyyy + '-' + mm + '-' + dd;
-        $('#fecha_fin').val(today);
-    }
-    //generate the chart with jqwidget with series = valor1,valor2,valor3
-    data = '{{datos|safe}}';
-    values = JSON.parse(data);
-    console.log(values);
-    var source = {
-        datatype: "json",
-        datafields: [{
-                name: 'valor1',
-                type: 'number'
-            },
-            {
-                name: 'valor2',
-                type: 'number'
-            },
-            {
-                name: 'valor3',
-                type: 'number'
-            }
-        ],
-        localdata: values
-    };
-    var dataAdapter = new $.jqx.dataAdapter(source);
-    $('#jqxChart').jqxChart({
-        title: '',
-        description: '',
-        showLegend: true,
-        showBorderLine: true,
-        borderLineColor: '#ebedf2',
-        borderLineWidth: 1,
-        backgroundColor: '#ffffff',
-        padding: {
-            left: 5,
-            top: 5,
-            right: 5,
-            bottom: 5
-        },
-        titlePadding: {
-            left: 90,
-            top: 0,
-            right: 0,
-            bottom: 10
-        },
-        source: dataAdapter,
-        categoryAxis: {
-            text: '',
-            showGridLines: false,
-            flip: false,
-            valuesOnTicks: false,
-            showTickMarks: false,
-            tickLength: 0,
-            tickMarksColor: '#ebedf2',
-            tickMarksWidth: 1,
-            gridLinesColor: '#ebedf2',
-            gridLinesWidth: 1,
-            gridLinesDashStyle: 'longdash',
-            gridLinesVisibility: 'visible',
-            labels: {
-                visible: false
-            }
-        },
-        colorScheme: 'scheme01',
-        seriesGroups: [{
-            type: 'column',
-            columnsGapPercent: 100,
-            seriesGapPercent: 5,
-            valueAxis: {
-                unitInterval: 10,
-                minValue: '',
-                displayValueAxis: true,
-                description: 'Cantidad ',
-                axisSize: 'auto',
-                tickMarksColor: '#888888',
-                gridLinesColor: '#777777'
-            },
-            series: [{
-                dataField: 'valor1',
-                displayText: 'Valor 1'
-            }, {
-                dataField: 'valor2',
-                displayText: 'Valor 2'
-            }, {
-                dataField: 'valor3',
-                displayText: 'Valor 3'
-            }]
-        }]
-    });
 </script>
 {% endblock javascript %}

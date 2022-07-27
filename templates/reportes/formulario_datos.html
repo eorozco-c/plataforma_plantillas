@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block contenido%}
+<!-- Page Heading -->
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <a href="{% url 'master:index' %}" class="align-self-center ms-2 mb-1 btn btn-primary text-light border"><i
+            class="far fa-arrow-alt-circle-left"></i> Volver al
+        menú</a>
+
+</div>
+<div class="row">
+    <div class="col-xl-12 col-md-12 mb-12">
+        <div class="card shadow mb-4">
+            <!-- Card Header - Dropdown -->
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Seleccione Elementos</h6>
+            </div>
+            <!-- Card Body -->
+            <div class="card-body">
+                <div style="width: 100%;">
+                    <form action="{% url 'reportes:get_datos' %}" method="POST">
+                        {% csrf_token %}
+                        <div class="form-group ">
+                            <label for="fecha_ini" class="">Fecha Inicio: </label>
+                            <input type="date" class="form-control" id="fecha_ini" name="fecha_ini"
+                                value="{{ fecha_ini }}">
+                        </div>
+                        <div class="form-group ">
+                            <label for="fecha_fin" class="">Fecha Fin: </label>
+                            <input type="date" class="form-control" id="fecha_fin" name="fecha_fin"
+                                value="{{ fecha_fin }}">
+                        </div>
+                        <div class="form-group ">
+                            <label for="plantilla" class="">Plantilla: </label>
+                            <select class="form-control" id="plantilla" name="plantilla">
+                                <option value="" selected disabled>Seleccione</option>
+                                {% for plantilla in plantillas %}
+                                <option value="{{ plantilla.id }}">{{ plantilla.nombre }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <!--Create 2 columns 1 for parametros and other for puntos-->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group ">
+                                    <h5>Parametros</h5>
+                                    <div id="check_parametros">
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group ">
+                                    <h5>Puntos de medición</h5>
+                                    <div id="check_puntos">
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary my-2">Buscar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+{% endblock contenido %}
+{% block javascript %}
+
+<script>
+    if ('{{fecha_ini}}' != 'None' && '{{fecha_ini}}' != '') {
+        $('#fecha_ini').val('{{fecha_ini}}');
+    } else {
+        var today = new Date();
+        var dd = today.getDate();
+        var mm = today.getMonth() + 1; //January is 0!
+        var yyyy = today.getFullYear();
+
+        if (dd < 10) {
+            dd = '0' + dd;
+        }
+
+        if (mm < 10) {
+            mm = '0' + mm;
+        }
+
+        today = yyyy + '-' + mm + '-' + dd;
+        $('#fecha_ini').val(today);
+    }
+    //if fecha_fin from request.get form set value to input else set value to today date at 00:00
+    if ('{{fecha_fin}}' != 'None' && '{{fecha_fin}}' != '') {
+        $('#fecha_fin').val('{{fecha_fin}}');
+    } else {
+        var today = new Date();
+        var dd = today.getDate();
+        var mm = today.getMonth() + 1; //January is 0!
+        var yyyy = today.getFullYear();
+
+        if (dd < 10) {
+            dd = '0' + dd;
+        }
+
+        if (mm < 10) {
+            mm = '0' + mm;
+        }
+
+        today = yyyy + '-' + mm + '-' + dd;
+        $('#fecha_fin').val(today);
+    }
+    //when plantilla change obtain elements thath checkbox input
+    $('#plantilla').change(function () {
+        //clear checkboxs
+        $('#check_parametros').html('');
+        $('#check_puntos').html('');
+        var plantilla = $('#plantilla').val();
+        $.ajax({
+            url: '{% url "reportes:get_form" %}',
+            type: 'GET',
+            data: {
+                plantilla: plantilla
+            },
+            success: function (data) {
+                //iterate over parametros and create checkbox input
+                $.each(data.parametros, function (index, parametro) {
+                    $('#check_parametros').append(
+                        '<div class="form-check">' +
+                        '<input class="form-check-input" type="checkbox" value="' +
+                        parametro.id +
+                        '" id="parametro_' + parametro.id + '" name="parametros" >' +
+                        '<label class="form-check-label" for="parametro_' + parametro
+                        .id + '">' +
+                        parametro.nombre + '</label>' +
+                        '</div>'
+                    );
+                });
+                //iterate over puntos and create checkbox input
+                $.each(data.puntos, function (index, punto) {
+                    $('#check_puntos').append(
+                        '<div class="form-check">' +
+                        '<input class="form-check-input" type="checkbox" value="' +
+                        punto.id +
+                        '" id="punto_' + punto.id + '" name="puntos">' +
+                        '<label class="form-check-label" for="punto_' + punto
+                        .id + '">' +
+                        punto.nombre + '</label>' +
+                        '</div>'
+                    );
+                });
+            }
+        });
+    });
+</script>
+{% endblock javascript %}

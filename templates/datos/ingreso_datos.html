@@ -19,14 +19,14 @@
     <div class="card-body">
         <form action="{% url 'datos:ingreso_datos' pk_plantilla=plantilla.id %}" method="POST">
             {% csrf_token %}
-            <div class="form-group">
+            <div class="form-group col-xl-4">
                 <label for="fecha">Fecha </label>
                 <input type="date" class="form-control" id="fecha" name="fecha" value="{{fecha}}" max="{{fecha}}"
                     required>
             </div>
 
             <!--horizontal is bucle ti {{puntos_medicion}}-->
-            <table class="table table-bordered table-responsive">
+            <table class="table table-bordered table-responsive-xl justify-content-center">
                 <thead class="table-dark">
                     <tr>
                         <th scope="col">#</th>
