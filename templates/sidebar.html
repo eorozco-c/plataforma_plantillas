@@ -1,0 +1,109 @@
+{% load static %}
+<!-- Sidebar -->
+<ul class="navbar-nav bg-corus-sidebar sidebar sidebar-dark accordion fs-3 text" id="accordionSidebar">
+
+    <!-- Sidebar - Brand -->
+    {% comment %} <a class="sidebar-brand d-flex align-items-center justify-content-center m-1" href="/">
+        <div class="sidebar-brand-icon ">
+            <img width="100%" src="{% static 'master/img/fondos/new/logo_corus_i.svg' %}" alt="Icono blanco Corus">
+        </div>
+        <div class="sidebar-brand-text mx-3">
+            <img width="100%" src="{% static 'master/img/fondos/new/corus_blanco_d.svg' %}" alt="Corus Logo">
+        </div>
+
+    </a> {% endcomment %}
+
+    <!-- Nav Item - Dashboard -->
+    <li id="nav-dashboard" class="nav-item ">
+        <a class="nav-link" href="/">
+            <i class="fas fa-fw fa-tachometer-alt"></i>
+            <span>Dashboard</span></a>
+    </li>
+
+    <!-- Divider -->
+    <hr class="sidebar-divider">
+
+    <!-- Heading -->
+    <div class="sidebar-heading">
+        General
+    </div>
+
+    <!-- Nav Item - Pages Collapse Menu -->
+    {% if user.is_superuser %}
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'licencias:generar_licencia' %}">
+            <i class="fas fa-fw fa-key"></i>
+            <span>Generar Licencia</span>
+        </a>
+    </li>
+    {% endif %}
+    {% if user.is_superuser %}
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'plantillas:tipos_plantillas' %}">
+            <i class="fas fa-fw fa-file-alt"></i>
+            <span>Tipo Plantilla</span>
+        </a>
+    </li>
+    {% endif %}
+
+    {% if user.is_staff  %}
+    <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-bs-toggle="collapse"
+            data-bs-target="#collapseSA" aria-expanded="false" aria-controls="collapseSA">
+            <i class="fas fa-brain"></i>
+            <span>Admin</span>
+        </a>
+        <div id="collapseSA" class="accordion-collapse collapse" aria-labelledby="headingOne"
+            data-bs-parent="#accordionSidebar">
+            <div class="bg-white py-2 font-weight-bold collapse-inner rounded">
+                <a id="nav-usuarios" class="collapse-item font-weight-bold"
+                    href="{% url 'usuarios:index' %}">Usuarios</a>
+                <a id="nav-licencias" class="collapse-item font-weight-bold"
+                    href="{% url 'licencias:index' %}">Licencias</a>
+                <a id="nav-empresas" class="collapse-item font-weight-bold"
+                    href="{% url 'empresas:index' %}">Empresas</a>
+                <a id="nav-parámetros" class="collapse-item font-weight-bold"
+                    href="{% url 'parametros:index' %}">Parámetros</a>
+                <a id="nav-puntos_medición" class="collapse-item font-weight-bold"
+                    href="{% url 'puntos_medicion:index' %}">Puntos de Medición</a>
+            </div>
+        </div>
+    </li>
+    {% endif %}
+
+
+    <!-- Nav Item - Utilities Collapse Menu -->
+    {% comment %} <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-bs-toggle="collapse"
+            data-bs-target="#collapseUtilities" aria-expanded="true" aria-controls="collapseUtilities">
+            <i class="fas fa-fw fa-wrench"></i>
+            <span>Utilidades</span>
+        </a>
+        <div id="collapseUtilities" class="accordion-collapse collapse" aria-labelledby="headingOne"
+            data-bs-parent="#accordionSidebar">
+
+        </div>
+    </li> {% endcomment %}
+
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'plantillas:index' %}">
+            <i class="fas fa-fw fa-file"></i>
+            <span>Plantillas</span></a>
+    </li>
+
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'reportes:index' %}">
+            <i class="fas fa-fw fa-chart-area"></i>
+            <span>Reportes</span></a>
+    </li>
+
+    <!-- Sidebar Toggler (Sidebar) -->
+    <hr class="sidebar-divider d-none d-md-block">
+
+    <div class="text-center d-none d-md-inline">
+        <button class="rounded-circle border-0" id="sidebarToggle"></button>
+    </div>
+</ul>
+{% block javascript %}
+
+{% endblock javascript %}

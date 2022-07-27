@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block contenido%}
+<!-- Page Heading -->
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <a href="{% url 'plantillas:index' %}" class="align-self-center ms-2 mb-1 btn btn-primary text-light border"><i
+            class="far fa-arrow-alt-circle-left"></i> Volver atrás</a>
+</div>
+{% if messages %}
+{% for message in messages %}
+<div class="alert alert-{{message.tags}} alert-dismissible" role="alert">{{message}}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endfor %}
+{% endif %}
+<!--FECHA HOY-->
+<!--- create form with horizontal is {{puntos_medicion}} and vertical is {{parametros}}-->
+<div class="card shadow mb-4">
+    <div class="card-body">
+        <form action="{% url 'datos:ingreso_datos' pk_plantilla=plantilla.id %}" method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="fecha">Fecha </label>
+                <input type="date" class="form-control" id="fecha" name="fecha" value="{{fecha}}" max="{{fecha}}"
+                    required>
+            </div>
+
+            <!--horizontal is bucle ti {{puntos_medicion}}-->
+            <table class="table table-bordered table-responsive">
+                <thead class="table-dark">
+                    <tr>
+                        <th scope="col">#</th>
+                        {% for punto_medicion in puntos_medicion %}
+                        <th scope="col">{{punto_medicion.nombre}}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    <!--vertical is bucle ti {{parametros}}-->
+                    {% for parametro in parametros %}
+                    <tr>
+                        <th scope="row">{{parametro.nombre}}</th>
+                        {% for punto_medicion in puntos_medicion %}
+                        <td>
+                            <input type="text" class="form-control value" name="{{punto_medicion.id}}_{{parametro.id}}"
+                                id="{{punto_medicion.id}}_{{parametro.id}}" placeholder="Ingrese valor">
+                        </td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <!--button submit in center-->
+            <div class="text-center">
+                <button type="submit" class="btn btn-primary">Guardar</button>
+            </div>
+
+        </form>
+    </div>
+</div>
+{% endblock contenido %}
+{% block javascript %}
+<script>
+    //with {{datos}} populate the table with the data 
+
+    '{% for dato in datos %}'
+    //'{{dato.valor}}' format 20,0 to 20.0
+    $('#{{dato.punto_medicion.id}}_{{dato.parametro.id}}').val('{{dato.valor|floatformat:2}}');
+    //add <small> to every input with dato.usuario
+    $('#{{dato.punto_medicion.id}}_{{dato.parametro.id}}').after('<small>{{dato.usuario}}</small>');
+
+    '{% endfor %}'
+
+    //if fecha change, get the data from the server and populate the table:
+    $('#fecha').change(function () {
+        var fecha = $('#fecha').val();
+        var url = '{% url "datos:get_datos" pk_plantilla=plantilla.id %}';
+        $.ajax({
+            url: url,
+            type: 'GET',
+            data: {
+                fecha: fecha
+            },
+            success: function (data) {
+                //if data is empty values
+                if (data.length == 0) {
+                    $('.value').val('');
+                    $('small').remove();
+                }
+                //with data populate the table with the data
+                for (var i = 0; i < data.length; i++) {
+                    $('#' + data[i].punto_medicion + '_' + data[i].parametro).val(data[i]
+                        .valor);
+                    //remove the <small> and add it again with the new user
+                    $('#' + data[i].punto_medicion + '_' + data[i].parametro).next().remove();
+                    $('#' + data[i].punto_medicion + '_' + data[i].parametro).after(
+                        '<small>' + data[i].usuario + '</small>');
+                }
+            }
+        });
+    });
+</script>
+{% endblock javascript %}

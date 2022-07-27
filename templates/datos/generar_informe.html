@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block contenido%}
+<!-- Page Heading -->
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <a href="{% url 'plantillas:index' %}" class="align-self-center ms-2 mb-1 btn btn-primary text-light border"><i
+            class="far fa-arrow-alt-circle-left"></i> Volver atrás</a>
+</div>
+{% if messages %}
+{% for message in messages %}
+<div class="alert alert-{{message.tags}} alert-dismissible" role="alert">{{message}}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endfor %}
+{% endif %}
+<!-- form that consult fecha_ini and fecha_fin-->
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">Fecha para {{plantilla.nombre}}</h6>
+    </div>
+    <div class="card-body">
+        <form action="{% url 'datos:generar_informe' pk_plantilla=plantilla.id %}" target="_blank" method="POST">
+            {% csrf_token %}
+            <!--container with 2 columns fecha_ini and fecha_fin-->
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="fecha_ini">Fecha </label>
+                            <input type="date" class="form-control" id="fecha_ini" name="fecha_ini"
+                                value="{{fecha_ini}}" required>
+                        </div>
+                    </div>
+
+                </div>
+                <button type="submit" class="btn btn-primary">Generar informe</button>
+            </div>
+
+        </form>
+    </div>
+</div>
+{% endblock contenido %}
+{% block javascript %}
+<script>
+    //max date today and min date one  year ago
+    $(document).ready(function () {
+        var today = new Date();
+        var dd = today.getDate();
+        var mm = today.getMonth() + 1; //January is 0!
+        var yyyy = today.getFullYear();
+        if (dd < 10) {
+            dd = '0' + dd;
+        }
+        if (mm < 10) {
+            mm = '0' + mm;
+        }
+        today = yyyy + '-' + mm + '-' + dd;
+        $("#fecha_ini").attr("max", today);
+        $("#fecha_ini").attr("min", yyyy - 1 + '-' + mm + '-' + dd);
+    });
+    //prevent defaul submit but consult data
+    $("form").submit(function (e) {
+        //e.preventDefault();
+        var form = $(this);
+        var url = form.attr('action');
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: form.serialize(), // serializes the form's elements.
+            success: function (data) {
+
+
+            }
+        });
+    });
+</script>
+{% endblock javascript %}

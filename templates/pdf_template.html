@@ -1,0 +1,290 @@
+<!DOCTYPE html
+    PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Informe {{plantilla.tipo|capfirst}}</title>
+</head>
+
+<body>
+    <table width="100%" border="0" cellspacing="0" cellpadding="0">
+        <!--
+        <tr>
+            <td colspan="2"><img src="logo.png" width="150" /></td>
+        </tr>
+        -->
+        <tr>
+            <td colspan="2">&nbsp;</td>
+        </tr>
+        <tr>
+            <td width="49%">
+                <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                    <tr>
+                        <td>
+                            <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                <tr>
+                                    <td
+                                        style="font-family:Verdana, Geneva, sans-serif; font-weight:600; font-size:15px;">
+                                        INFORME {{plantilla.tipo|upper}}</td>
+                                </tr>
+                                <tr>
+                                    <td
+                                        style="font-family:Verdana, Geneva, sans-serif; font-weight:300; font-size:13px;">
+                                        Invoice Number: {{data.id}}</td>
+                                </tr>
+                                <tr>
+                                    <td>&nbsp;</td>
+                                </tr>
+                                <tr>
+                                    <td
+                                        style="font-family:Verdana, Geneva, sans-serif; font-weight:600; font-size:15px;">
+                                        Service Provider </td>
+                                </tr>
+                                <tr>
+                                    <td
+                                        style="font-family:Verdana, Geneva, sans-serif; font-weight:400; font-size:14px;">
+                                        Mahesh Traders</td>
+                                </tr>
+
+                                <td style="font-family:Verdana, Geneva, sans-serif; font-weight:300; font-size:13px;">
+                                    1001A, The Capital B Wing, 10th Floor, Bandra Kurla Complex, Bandra (E), Mumbai,
+                                    Contact: 7863087385 </td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp;</td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+    <td width="51%" valign="top">
+        <table width="100%" border="0" cellspacing="0" cellpadding="0">
+            <!--
+            <tr>
+                <td align="right"><img src="logo.png" alt="" width="150" /></td>
+            </tr>
+            -->
+
+            <tr>
+                <td style="font-family:Verdana, Geneva, sans-serif; font-weight:300; font-size:13px;" align="right">
+                </td>
+            </tr>
+            <tr>
+                <td style="font-family:Verdana, Geneva, sans-serif; font-weight:300; font-size:13px;" align="right">
+                    &nbsp;</td>
+            </tr>
+            <tr>
+                <td style="font-family:Verdana, Geneva, sans-serif; font-weight:300; font-size:13px;" align="right">
+                    Fecha generacion informe: {{fecha}}</td>
+            </tr>
+            <tr>
+                <td style="font-family:Verdana, Geneva, sans-serif; font-weight:300; font-size:13px;" align="right">
+                    Fecha datos: {{rango_fecha}}</td>
+            </tr>
+            <tr>
+                <td style="font-family:Verdana, Geneva, sans-serif; font-weight:600; font-size:15px;" align="right">
+                    {{user.empresa}}</td>
+            </tr>
+            <tr>
+                <td style="font-family:Verdana, Geneva, sans-serif; font-weight:300; font-size:13px;" align="right">
+                    {{data.name}}</td>
+            </tr>
+            <tr>
+                <td style="font-family:Verdana, Geneva, sans-serif; font-weight:300; font-size:13px;" align="right">
+                    {{data.address}}</td>
+            </tr>
+
+        </table>
+    </td>
+    </tr>
+    <tr>
+        <td colspan="2">&nbsp;</td>
+    </tr>
+    <tr>
+        <td colspan="2">
+            <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                <thead>
+                    <tr>
+                        <th style="font-family:Verdana, Geneva, sans-serif; font-weight:600; font-size:13px; border-top:1px solid #333; border-bottom:1px solid #333; border-left:1px solid #333; border-right:1px solid #333; padding: 3px;"
+                            width="34%" height="32" align="center">#</th>
+                        {% for punto_medicion in puntos_medicion %}
+                        <th style="font-family:Verdana, Geneva, sans-serif;font-weight:600; font-size:10px; border-top:1px solid #333; border-bottom:1px solid #333; border-left:1px solid #333; border-right:1px solid #333; padding: 3px;"
+                            width="34%" height="32" align="center">{{punto_medicion.nombre}}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    <!--vertical is bucle ti {{parametros}}-->
+                    {% for parametro in parametros %}
+                    <tr>
+                        <th style="font-family:Verdana, Geneva, sans-serif; font-weight:300; font-size:13px; border-bottom:1px solid #333; border-left:1px solid #333; border-right:1px solid #333; padding: 1.5px;"
+                            height="32" align="center">{{parametro.nombre}}</th>
+                        {% for punto_medicion in puntos_medicion %}
+                        <!--from {{datos}} populate table-->
+                        {% for dato in datos %}
+                        {% if dato.parametro_id == parametro.id and dato.punto_medicion_id == punto_medicion.id %}
+                        <td style="font-family:Verdana, Geneva, sans-serif; font-weight:300; font-size:13px; border-bottom:1px solid #333; border-left:1px solid #333; border-right:1px solid #333;"
+                            height="32" align="center">{{dato.valor}}</td>
+                        {% endif %}
+                        {% endfor %}
+
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2">&nbsp;</td>
+    </tr>
+    <tr>
+        <td colspan="2">&nbsp;</td>
+    </tr>
+    <tr>
+        <td style="font-family:Verdana, Geneva, sans-serif; font-weight:600; font-size:13px;" colspan="2">Please Note:
+        </td>
+    </tr>
+    <tr>
+        <td style="font-family:Verdana, Geneva, sans-serif; font-weight:300; font-size:13px;" colspan="2">Dear Consumer,
+            the bill payment will reflect in next 48 hours in your account. Please contact our customer support for any
+            queries regarding this order.</td>
+    </tr>
+    <tr>
+        <td colspan="2">&nbsp;</td>
+    </tr>
+    <tr>
+        <td style="font-family:Verdana, Geneva, sans-serif; font-weight:600; font-size:13px;" colspan="2">Thank you for
+            using our service</td>
+    </tr>
+    <td colspan="2">&nbsp;</td>
+    </tr>
+    <tr>
+        <td colspan="2">&nbsp;</td>
+    </tr>
+    <tr>
+        <td style="font-family:Verdana, Geneva, sans-serif; font-weight:300; font-size:13px;" colspan="2"
+            align="center">(This is computer generated receipt and does not require physical signature.) </td>
+    </tr>
+    <tr>
+        <td colspan="2">&nbsp;</td>
+    </tr>
+    <tr>
+        <td colspan="2">&nbsp;</td>
+    </tr>
+    <tr>
+        <td colspan="2">&nbsp;</td>
+    </tr>
+    <tr>
+        <td colspan="2">&nbsp;</td>
+    </tr>
+    {% if user.is_staff %}
+    <table width="100%" border="0" cellspacing="0" cellpadding="0">
+        <tr>
+            <td colspan="2">&nbsp;</td>
+        </tr>
+        <tr>
+            <td width="49%">
+                <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                    <thead>
+                        <tr>
+                            <th style="font-family:Verdana, Geneva, sans-serif; font-weight:600; font-size:13px; border-top:1px solid #333; border-bottom:1px solid #333; border-left:1px solid #333; border-right:1px solid #333; padding: 3px;"
+                                width="34%" height="32" align="center">FACTORES</th>
+                            <!--obtain calderas from json_data-->
+                            {% for jdata in json_data %}
+                            {% if jdata.name == "Factor de conductividad" %}
+                            {% for data in jdata.data %}
+                            <th style="font-family:Verdana, Geneva, sans-serif;font-weight:600; font-size:10px; border-top:1px solid #333; border-bottom:1px solid #333; border-left:1px solid #333; border-right:1px solid #333; padding: 3px;"
+                                width="34%" height="32" align="center">{{data.name}}</th>
+                            {% endfor %}
+                            {% endif %}
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        {% for jdata in json_data %}
+                        <!--jdata.name contains FC skip-->
+                        {% if 'FC' not in jdata.name %}
+                        <tr>
+                            <th style="font-family:Verdana, Geneva, sans-serif; font-weight:300; font-size:13px; border-bottom:1px solid #333; border-left:1px solid #333; border-right:1px solid #333; padding: 1.5px;"
+                                height="32" align="center">{{jdata.name}}</th>
+                            {% for data in jdata.data %}
+                            <td style="font-family:Verdana, Geneva, sans-serif; font-weight:300; font-size:13px; border-bottom:1px solid #333; border-left:1px solid #333; border-right:1px solid #333;"
+                                height="32" align="center">{{data.valor}}</td>
+                            {% endfor %}
+                        </tr>
+                        {% endif %}
+                        {% endfor %}
+
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+    </table>
+
+    <table width="100%" border="0" cellspacing="0" cellpadding="0">
+        <tr>
+            <td colspan="2">&nbsp;</td>
+        </tr>
+        <tr>
+            <td width="100%">
+                <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                    <thead>
+                        {% for jdata in json_data %}
+                        {% if 'FC' in jdata.name %}
+                        <tr>
+                            <th style="font-family:Verdana, Geneva, sans-serif; font-weight:600; font-size:13px; border-top:1px solid #333; border-bottom:1px solid #333; border-left:1px solid #333; border-right:1px solid #333; padding: 3px;"
+                                width="60%" height="32" align="center">{{jdata.name}}</th>
+                            {% for jdata in json_data %}
+                            {% if jdata.name == "Factor de conductividad" %}
+                            {% for data in jdata.data %}
+                            <th style="font-family:Verdana, Geneva, sans-serif;font-weight:600; font-size:10px; border-top:1px solid #333; border-bottom:1px solid #333; border-left:1px solid #333; border-right:1px solid #333; padding: 3px;"
+                                width="50%" height="32" align="center">{{data.name}}</th>
+                            <th style="font-family:Verdana, Geneva, sans-serif;font-weight:600; font-size:10px; border-top:1px solid #333; border-bottom:1px solid #333; border-left:1px solid #333; border-right:1px solid #333; padding: 3px;"
+                                width="34%" height="32" align="center">ESTADO</th>
+                            {% endfor %}
+                            {% endif %}
+                            {% endfor %}
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for data in jdata.data  %}
+                        <tr>
+                            <td style="font-family:Verdana, Geneva, sans-serif; font-weight:300; font-size:13px; border-bottom:1px solid #333; border-left:1px solid #333; border-right:1px solid #333; padding: 3px;"
+                                height="32" align="center">{{data.name}}</td>
+                            {% for valor in data.data %}
+                            <td style="font-family:Verdana, Geneva, sans-serif; font-weight:300; font-size:13px; border-bottom:1px solid #333; border-left:1px solid #333; border-right:1px solid #333; padding: 3px;"
+                                height="32" align="center">{{valor.valor}}</td>
+                            {% if valor.status == "ok" %}
+                            <td style="font-family:Verdana, Geneva, sans-serif; font-weight:300; font-size:13px; border-bottom:1px solid #333; border-left:1px solid #333; border-right:1px solid #333; padding: 3px; background-color: #00FF00;"
+                                height="32" align="center">{{valor.status}}</td>
+                            {% else %}
+                            <td style="font-family:Verdana, Geneva, sans-serif; font-weight:300; font-size:13px; border-bottom:1px solid #333; border-left:1px solid #333; border-right:1px solid #333; padding: 3px; background-color: #FF0000;"
+                                height="32" align="center">{{valor.status}}</td>
+                            {% endif %}
+
+
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                        <tr>
+                            <td colspan="2">&nbsp;</td>
+                        </tr>
+                        {% endif %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+    </table>
+
+    {% endif %}
+
+    </table>
+</body>
+
+</html>

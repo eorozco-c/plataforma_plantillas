@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% load filtros_extra %}
+{% load static %}
+
+{% block contenido%}
+<!-- Page Heading -->
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <a href="{% url 'master:index' %}" class="align-self-center ms-2 mb-1 btn btn-primary text-light border"><i
+            class="far fa-arrow-alt-circle-left"></i> Volver al
+        menú</a>
+    <div>
+    </div>
+</div>
+
+{% if messages %}
+{% for message in messages %}
+<div class="alert alert-{{message.tags}} alert-dismissible" role="alert">{{message}}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endfor %}
+{% endif %}
+<div class="input-group mt-2">
+    <form method="post" enctype="multipart/form-data" action="{% url 'licencias:import' %}">
+        {% csrf_token %}
+        <div class="input-group">
+            <input type="file" accept=".key" class="form-control" name="archivo">
+            <button type="submit" class="btn btn-danger text-light">Upload</button>
+        </div>
+        <small id="" class="ms-1 form-text text-muted"> Archivos .key validos</small>
+    </form>
+</div>
+<div class="table-responsive mt-3">
+    <table id="tabla_base" class="table table-striped table-hover table-borderless" style="width:100%">
+        <thead class="table-dark">
+            <tr>
+                <th>Elemento</th>
+                <th>Asignadas</th>
+                <th>Ocupadas</th>
+                <th>Disponibles</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Empresas</td>
+                <td>{{object_list.empresas}}</td>
+                <td>{{lista.empresas}}</td>
+                <td>{{object_list.empresas|substract:lista.empresas}}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+{% endblock contenido %}
+{% block javascript %}
+<script>
+
+</script>
+{% endblock javascript %}

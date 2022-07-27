@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block contenido%}
+<!-- Page Heading -->
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <a href="{% url 'master:index' %}" class="align-self-center ms-2 mb-1 btn btn-primary text-light border"><i
+            class="far fa-arrow-alt-circle-left"></i> Volver al
+        menú</a>
+    {% if request.user.is_staff %}
+    <a href="{% url 'plantillas:agregar' %}" class="align-self-center ms-2 mb-1 btn btn-success text-light border"><i
+            class="fas fa-plus-circle"></i> Agregar
+        Plantilla</a>
+    {% endif %}
+</div>
+<div class="table-responsive mt-3">
+    <table id="tabla_base" class="table table-striped table-hover table-borderless" style="width:100%">
+        <thead class="table-dark">
+            <tr>
+                <th>Nombre</th>
+                <th>Tipo</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for plantilla in object_list %}
+            <tr>
+                <td>{{plantilla.nombre}}</td>
+                <td>{{plantilla.tipo}}</td>
+                <td>{% if plantilla.activo %}<span class="badge badge-success">Activo</span>{% else %}<span
+                        class="badge badge-danger">Inactivo</span>{% endif %}</td>
+                <td>
+                    {% if request.user.is_staff %}
+                    <a class="btn btn-primary btn-sm text-light border border-dark m-1"
+                        href="{% url 'plantillas:editar' pk=plantilla.id %}" id="edit"><i class="fas fa-edit"></i>
+                        Editar</a>
+                    {% endif %}
+                    <a class="btn btn-danger btn-sm text-light border border-dark m-1"
+                        href="{% url 'datos:ingreso_datos' pk_plantilla=plantilla.id %}" id="add_datos"><i
+                            class="fas fa-plus-circle"></i> Datos</a>
+                    <!--Generar informe-->
+                    <a class="btn btn-success btn-sm text-light border border-dark m-1"
+                        href="{% url 'datos:generar_informe' pk_plantilla=plantilla.id %}" id="add_datos"><i
+                            class="fas fa-plus-circle"></i> Generar Informe</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+
+
+{% endblock contenido %}
+{% block javascript %}
+<script>
+</script>
+{% endblock javascript %}

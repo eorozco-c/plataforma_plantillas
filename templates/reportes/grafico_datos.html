@@ -1,0 +1,167 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block contenido%}
+<!-- Page Heading -->
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <a href="{% url 'master:index' %}" class="align-self-center ms-2 mb-1 btn btn-primary text-light border"><i
+            class="far fa-arrow-alt-circle-left"></i> Volver al
+        menú</a>
+    <form action="{% url 'reportes:index' %}" method="GET" class="form-inline">
+        <div class="form-group mx-sm-3 mb-2">
+            <label for="fecha_ini" class="me-1">Fecha Inicio: </label>
+            <input type="date" class="form-control" id="fecha_ini" name="fecha_ini" value="{{ fecha_ini }}">
+        </div>
+        <div class="form-group mx-sm-3 mb-2">
+            <label for="fecha_fin" class="me-1">Fecha Fin: </label>
+            <input type="date" class="form-control" id="fecha_fin" name="fecha_fin" value="{{ fecha_fin }}">
+        </div>
+        <button type="submit" class="btn btn-primary mb-2">Buscar</button>
+    </form>
+
+</div>
+<div class="row">
+    <div class="col-xl-12 col-md-12 mb-12">
+        <div class="card shadow mb-4">
+            <!-- Card Header - Dropdown -->
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">ESTADÍSTICAS</h6>
+            </div>
+            <!-- Card Body -->
+            <div class="card-body">
+                <div id='jqxChart' style="width: 100%; height: 400px;"></div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock contenido %}
+{% block javascript %}
+
+<script>
+    if ('{{fecha_ini}}' != 'None' && '{{fecha_ini}}' != '') {
+        $('#fecha_ini').val('{{fecha_ini}}');
+    } else {
+        var today = new Date();
+        var dd = today.getDate();
+        var mm = today.getMonth() + 1; //January is 0!
+        var yyyy = today.getFullYear();
+
+        if (dd < 10) {
+            dd = '0' + dd;
+        }
+
+        if (mm < 10) {
+            mm = '0' + mm;
+        }
+
+        today = yyyy + '-' + mm + '-' + dd;
+        $('#fecha_ini').val(today);
+    }
+    //if fecha_fin from request.get form set value to input else set value to today date at 00:00
+    if ('{{fecha_fin}}' != 'None' && '{{fecha_fin}}' != '') {
+        $('#fecha_fin').val('{{fecha_fin}}');
+    } else {
+        var today = new Date();
+        var dd = today.getDate();
+        var mm = today.getMonth() + 1; //January is 0!
+        var yyyy = today.getFullYear();
+
+        if (dd < 10) {
+            dd = '0' + dd;
+        }
+
+        if (mm < 10) {
+            mm = '0' + mm;
+        }
+
+        today = yyyy + '-' + mm + '-' + dd;
+        $('#fecha_fin').val(today);
+    }
+    //generate the chart with jqwidget with series = valor1,valor2,valor3
+    data = '{{datos|safe}}';
+    values = JSON.parse(data);
+    console.log(values);
+    var source = {
+        datatype: "json",
+        datafields: [{
+                name: 'valor1',
+                type: 'number'
+            },
+            {
+                name: 'valor2',
+                type: 'number'
+            },
+            {
+                name: 'valor3',
+                type: 'number'
+            }
+        ],
+        localdata: values
+    };
+    var dataAdapter = new $.jqx.dataAdapter(source);
+    $('#jqxChart').jqxChart({
+        title: '',
+        description: '',
+        showLegend: true,
+        showBorderLine: true,
+        borderLineColor: '#ebedf2',
+        borderLineWidth: 1,
+        backgroundColor: '#ffffff',
+        padding: {
+            left: 5,
+            top: 5,
+            right: 5,
+            bottom: 5
+        },
+        titlePadding: {
+            left: 90,
+            top: 0,
+            right: 0,
+            bottom: 10
+        },
+        source: dataAdapter,
+        categoryAxis: {
+            text: '',
+            showGridLines: false,
+            flip: false,
+            valuesOnTicks: false,
+            showTickMarks: false,
+            tickLength: 0,
+            tickMarksColor: '#ebedf2',
+            tickMarksWidth: 1,
+            gridLinesColor: '#ebedf2',
+            gridLinesWidth: 1,
+            gridLinesDashStyle: 'longdash',
+            gridLinesVisibility: 'visible',
+            labels: {
+                visible: false
+            }
+        },
+        colorScheme: 'scheme01',
+        seriesGroups: [{
+            type: 'column',
+            columnsGapPercent: 100,
+            seriesGapPercent: 5,
+            valueAxis: {
+                unitInterval: 10,
+                minValue: '',
+                displayValueAxis: true,
+                description: 'Cantidad ',
+                axisSize: 'auto',
+                tickMarksColor: '#888888',
+                gridLinesColor: '#777777'
+            },
+            series: [{
+                dataField: 'valor1',
+                displayText: 'Valor 1'
+            }, {
+                dataField: 'valor2',
+                displayText: 'Valor 2'
+            }, {
+                dataField: 'valor3',
+                displayText: 'Valor 3'
+            }]
+        }]
+    });
+</script>
+{% endblock javascript %}
