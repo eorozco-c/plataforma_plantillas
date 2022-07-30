@@ -14,8 +14,19 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AddField(
             model_name='puntomedicion',
+            name='created_at',
+            field=models.DateTimeField(auto_now_add=True, default=1),
+            preserve_default=False,
+        ),
+        migrations.AddField(
+            model_name='puntomedicion',
             name='tipo',
             field=models.ForeignKey(default=1, on_delete=django.db.models.deletion.CASCADE, related_name='puntos_medicion_tipo', to='plantillas.tipoplantilla'),
             preserve_default=False,
+        ),
+        migrations.AddField(
+            model_name='puntomedicion',
+            name='updated_at',
+            field=models.DateTimeField(auto_now=True),
         ),
     ]

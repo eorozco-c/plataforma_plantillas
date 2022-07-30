@@ -3,7 +3,11 @@
 }
 
 .body_login {
-  background-image: url("/static/master/img/fondos/new/cumulusbackground.svg");
+  background-image: url("/static/master/img/fondos/new/der_login.png") ;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
 }
 
 .special-card {
@@ -36,7 +40,8 @@
 }
 
 .bg-corus-sidebar {
-  background: url(/static/master/img/fondos/new/der_login.png) no-repeat center center fixed;
+  /* background: url(/static/master/img/fondos/new/cumulusbackground.svg) no-repeat center center fixed; */
+  background-color: black;
 }
 
 #loading {

@@ -10,7 +10,7 @@ class FormularioPuntoMedicion(forms.ModelForm):
 
     class Meta:
         model = PuntoMedicion
-        fields = ["nombre", "descripcion", "activo"]
+        fields = ["nombre", "descripcion", "tipo","activo"]
 
         widgets = {
             'descripcion': forms.Textarea(attrs={'rows': 4}),

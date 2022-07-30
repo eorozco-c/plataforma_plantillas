@@ -11,6 +11,9 @@
     </div>
     {% endfor %}
     {% endif %}
+    <div class="sidebar-brand-text mx-3">
+        <img width="100%" src="{% static 'master/img/logo.jpg' %}" alt="Logo">
+    </div>
     <form method="POST" class="mt-5 p-3 rounded-3 text-white">
         {% csrf_token %}
         {{form}}
