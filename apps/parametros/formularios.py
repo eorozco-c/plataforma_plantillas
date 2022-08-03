@@ -3,7 +3,7 @@ from django import forms
 from .models import Parametro
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Submit
-from apps.validaciones import validarLetras
+from apps.validaciones import validarLetrasNumerosReturn
 
 
 class FormularioParametros(forms.ModelForm):
@@ -16,13 +16,16 @@ class FormularioParametros(forms.ModelForm):
             'descripcion': forms.Textarea(attrs={'rows': 4}),
         }
 
-    def clean_abreviado(self):
-        abreviado = self.cleaned_data['abreviado']
-        if abreviado is None:
-            return None
-        validarLetras(abreviado, "Abreviado")
-        return abreviado
+    # def clean_abreviado(self):
+    #     abreviado = self.cleaned_data['abreviado']
+    #     if abreviado is None:
+    #         return None
+    #     if validarLetrasNumerosReturn(abreviado):
+    #         return abreviado
+    #     else:
+    #         raise forms.ValidationError("El abreviado debe contener solo letras y números.")
 
+        
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.helper = FormHelper()

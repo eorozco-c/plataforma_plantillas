@@ -80,3 +80,10 @@ def validarFecha(fecha):
     if fecha < today:
         raise ValidationError("Fecha debe ser mayor o igual a la actual.")
     return fecha
+
+def validarLetrasNumerosReturn(cadena):
+    print(LETTER_REGEX.match(cadena))
+    print(ANEXO_REGEX.match(cadena))
+    if not LETTER_REGEX.match(cadena) and not ANEXO_REGEX.match(cadena):
+        return False
+    return True
