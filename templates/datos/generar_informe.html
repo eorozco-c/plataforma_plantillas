@@ -16,7 +16,7 @@
 <!-- form that consult fecha_ini_tabla and fecha_fin-->
 <div class="card shadow mb-4">
     <div class="card-header py-3">
-        <h6 class="m-0 font-weight-bold text-primary">Fecha para {{plantilla.nombre}}</h6>
+        <h6 class="m-0 font-weight-bold text-primary">{{plantilla.nombre}}</h6>
     </div>
     <div class="card-body">
         <form action="{% url 'datos:generar_informe' pk_plantilla=plantilla.id %}" target="_blank" method="POST">
@@ -29,9 +29,59 @@
                             <label for="fecha_ini_tabla">Fecha </label>
                             <input type="date" class="form-control" id="fecha_ini_tabla" name="fecha_ini_tabla"
                                 value="{{fecha_ini_tabla}}" required>
+                            <label for="fecha_ini">Fecha inicio graficos</label>
+                            <input type="date" class="form-control" id="fecha_ini" name="fecha_ini"
+                                value="{{fecha_ini}}" required>
+                            <label for="fecha_fin">Fecha fin graficos</label>
+                            <input type="date" class="form-control" id="fecha_fin" name="fecha_fin"
+                                value="{{fecha_fin}}" required>
+                            <div class="row mt-4">
+                                <div class="col-md-6">
+                                    <div class="form-group ">
+                                        <h5>Parametros</h5>
+                                        <div id="check_parametros">
+                                            {% for parametro in parametros %}
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" value="{{parametro.id}}"
+                                                    id="parametro_{{parametro.id}}" name="parametros">
+                                                <label class="form-check-label" for="parametro_{{parametro.id}}">
+                                                    {{parametro.nombre}}</label>
+                                            </div>
+
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group ">
+                                        <h5>Puntos de medición</h5>
+                                        <div id="check_puntos">
+                                            {% for punto in puntos %}
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" value="{{punto.id}}"
+                                                    id="punto_{{punto.id}}" name="puntos">
+                                                <label class="form-check-label" for="punto_{{punto.id}}">
+                                                    {{punto.nombre}}</label>
+                                            </div>
+
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-
+                    <div class="col-md-6  border-left">
+                        <h3 class="text-right">Fechas existentes</h3>
+                        <div class="overflow-scroll" style="height: 300px;">
+                            <ul>
+                                {% for fecha in fechas_existentes %}
+                                <li class="text-right">{{fecha.fecha}}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
                 </div>
                 <button type="submit" class="btn btn-primary">Generar informe</button>
             </div>

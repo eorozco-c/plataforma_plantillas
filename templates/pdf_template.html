@@ -17,17 +17,24 @@
 <body style="margin:2rem;">
     <div id="container-fluid">
         <!--two columns space between-->
-        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center">
-            <div>
-                <h1 class="m-0">Informe {{plantilla.tipo|capfirst}}</h1>
-                <p>Invoice Number: {{data.id}}</p>
-                <h3 class="mt-3">Información de cliente:</h3>
+        <div class="mb-3">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center">
+                <div>
+                    <h1 class="m-0">Informe {{plantilla.tipo|capfirst}}</h1>
+                    <!--<p>Invoice Number: {{data.id}}</p>-->
+                </div>
+                <div>
+                    <p class="text-right m-0">Fecha generacion informe: {{fecha}}</p>
+                    <p class="text-right m-0">Fecha datos tabla: {{fecha_ini_tabla}}</p>
+                    <p class="text-right m-0">Rango fecha Gráficos: {{fecha_ini}} - {{fecha_fin}}</p>
+                </div>
             </div>
-            <div>
-                <p class="text-right m-0">Fecha generacion informe: {{fecha}}</p>
-                <p class="text-right m-0">Fecha datos tabla: {{fecha_ini_tabla}}</p>
-                <p class="fw-bold text-right m-0">{{user.empresa}}</p>
-            </div>
+            <h3 class="mt-3">Información de cliente:</h3>
+            <p class="fw-bold m-0">{{user.empresa}}</p>
+            <p class="m-0">{{user.empresa.direccion}}</p>
+            <p class="m-0">{{user.empresa.telefono}}</p>
+            <p class="m-0">{{user.empresa.email}}</p>
+            <p class="m-0">{{user.empresa.rut}}</p>
         </div>
 
         <table class="table">
@@ -68,7 +75,8 @@
                 <textarea class="form-control" id="textarea_notas" rows="3"></textarea>
                 <button class="btn btn-primary" id="btn-notas">Agregar Nota</button>
             </div>
-            <div id="lista_notas">
+            <div id="lista_notas" class="mt-3">
+                <h1>Notas:</h1>
                 <ul>
                 </ul>
             </div>
@@ -191,12 +199,12 @@
         <!--new table with images-->
         <div class="row justify-content-center mt-5">
             <div class="col-xl-12 col-md-12 mb-12">
-                {% for parametro in parametros  %}
+                {% for parametro in parametros_list  %}
                 <div class="page_fix">
                     <h2 class="text-center p-2 mt-3 display-3">{{parametro.nombre}}</h2>
                     <div class="row">
 
-                        {% for punto in puntos_medicion  %}
+                        {% for punto in puntos_list  %}
                         <div class="col-xl-4 col-md-6 mb-4">
                             <div class="card border-left-primary shadow h-100 py-2">
                                 <div class="row no-gutters align-items-center">

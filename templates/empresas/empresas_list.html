@@ -18,6 +18,10 @@
             <tr>
                 <th>ID</th>
                 <th>Nombre</th>
+                <th>Dirección</th>
+                <th>Teléfono</th>
+                <th>Correo</th>
+                <th>Rut</th>
                 <th>Acciones</th>
             </tr>
         </thead>
@@ -26,6 +30,10 @@
             <tr>
                 <td>{{empresa.id}}</td>
                 <td>{{empresa.nombre}}</td>
+                <td>{{empresa.direccion}}</td>
+                <td>{{empresa.telefono}}</td>
+                <td>{{empresa.email}}</td>
+                <td>{{empresa.rut}}</td>
                 <td>
                     <a class="btn btn-dark btn-sm text-light border border-dark m-1"
                         href="{% url 'empresas:cambiarEmpresa' pk=empresa.id %}" id="view"><i class="fas fa-eye"></i>

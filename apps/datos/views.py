@@ -99,15 +99,38 @@ def ingreso_datos(request, pk_plantilla):
 def generar_informe(request, pk_plantilla):
     if request.method == "GET":
         plantilla = Plantilla.objects.get(id=pk_plantilla)
+        puntos = PuntoMedicion.objects.filter(tipo=plantilla.tipo, empresa=request.user.empresa)
+        parametros = Parametro.objects.filter(tipo=plantilla.tipo)
+        #obtain group by fecha, parametros and puntos of datos of plantilla
+        fechas_existentes = Datos.objects.filter(plantilla=plantilla).values('fecha').distinct().order_by('fecha')
+        puntos_list = []
+        parametros_list = []
+        for punto in puntos:
+            puntos_list.append({
+                'nombre' : punto.nombre,
+                'id' : punto.id,
+            })
+        for parametro in parametros:
+            parametros_list.append({
+                'nombre' : parametro.nombre,
+                'id' : parametro.id,
+            })
         #convert all datos to float
         context = {
             'plantilla': plantilla,
             'appname': 'Generar informe',
+            'puntos': puntos_list,
+            'parametros': parametros_list,
+            'fechas_existentes': fechas_existentes,
         }
         return render(request, "datos/generar_informe.html", context)
     elif request.method == "POST":
         fecha_ini_tabla = request.POST['fecha_ini_tabla']
+        fecha_ini = request.POST['fecha_ini']
+        fecha_fin = request.POST['fecha_fin']
         plantilla = Plantilla.objects.get(id=pk_plantilla)
+        puntos_form = request.POST.getlist('puntos')
+        parametros_form = request.POST.getlist('parametros')
         if plantilla.tipo.nombre == "caldera":
             #obtain all datos with plantilla
             datos = Datos.objects.filter(plantilla=plantilla,fecha=fecha_ini_tabla)
@@ -244,22 +267,18 @@ def generar_informe(request, pk_plantilla):
             parametros = Parametro.objects.filter(tipo=plantilla.tipo)
             puntos_medicion = PuntoMedicion.objects.filter(empresa=request.user.empresa, tipo=plantilla.tipo)
             datos_n = Datos.objects.filter(fecha=fecha_ini_tabla,plantilla=plantilla)
-            
-            
-            fecha_ini = "2022-01-01"
-            fecha_fin = "2023-01-01"
             datos_json = {}
             parametros_list = []
             puntos_list = []
-            for p in puntos_medicion:
-                puntos_list.append(PuntoMedicion.objects.get(pk=p.id))
-            for parametro in parametros:
-                parametro = Parametro.objects.get(pk=parametro.id)
+            for p in puntos_form:
+                puntos_list.append(PuntoMedicion.objects.get(pk=p))
+            for parametro in parametros_form:
+                parametro = Parametro.objects.get(pk=parametro)
                 parametros_list.append(parametro)
                 datos_json[parametro.id] = []
-                for punto in puntos_medicion:
+                for punto in puntos_form:
 
-                    punto = PuntoMedicion.objects.get(pk=punto.id)
+                    punto = PuntoMedicion.objects.get(pk=punto)
                     datos_n = Datos.objects.filter(punto_medicion=punto, parametro=parametro, fecha__range=[fecha_ini, fecha_fin],plantilla=plantilla)
                     #order by fecha asc
                     datos_n = datos_n.order_by('fecha')
@@ -280,10 +299,14 @@ def generar_informe(request, pk_plantilla):
                 "plantilla": plantilla,
                 "parametros": parametros,
                 "puntos_medicion": puntos_medicion,
+                "puntos_list": puntos_list,
+                "parametros_list": parametros_list,
                 "datos": datos,
                 "json_data": json_data,
                 "fecha": datetime.now().date(),
                 "fecha_ini_tabla": fecha_ini_tabla,
+                "fecha_ini": fecha_ini,
+                "fecha_fin": fecha_fin,
                 "user": request.user,
                 "datos_json": datos_json,
             }
