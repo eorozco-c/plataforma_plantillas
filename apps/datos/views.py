@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -9,7 +10,8 @@ from datetime import datetime
 from apps.utils import html_to_pdf
 from django.http import HttpResponse,JsonResponse
 from django.template.loader import render_to_string
-
+import matplotlib.pyplot as plt
+import os,json
 
 ##############################################################################
 @login_required(login_url='/')
@@ -104,11 +106,11 @@ def generar_informe(request, pk_plantilla):
         }
         return render(request, "datos/generar_informe.html", context)
     elif request.method == "POST":
-        fecha_ini = request.POST['fecha_ini']
+        fecha_ini_tabla = request.POST['fecha_ini_tabla']
         plantilla = Plantilla.objects.get(id=pk_plantilla)
         if plantilla.tipo.nombre == "caldera":
             #obtain all datos with plantilla
-            datos = Datos.objects.filter(plantilla=plantilla,fecha=fecha_ini)
+            datos = Datos.objects.filter(plantilla=plantilla,fecha=fecha_ini_tabla)
             if datos.count() == 0:
                 messages.success(request, 'No hay datos para la fecha seleccionada.',extra_tags='danger')
                 return redirect('datos:generar_informe', pk_plantilla=plantilla.id)
@@ -241,7 +243,39 @@ def generar_informe(request, pk_plantilla):
             plantilla = Plantilla.objects.get(id=pk_plantilla)
             parametros = Parametro.objects.filter(tipo=plantilla.tipo)
             puntos_medicion = PuntoMedicion.objects.filter(empresa=request.user.empresa, tipo=plantilla.tipo)
-            datos = Datos.objects.filter(fecha=fecha_ini,plantilla=plantilla)
+            datos_n = Datos.objects.filter(fecha=fecha_ini_tabla,plantilla=plantilla)
+            
+            
+            fecha_ini = "2022-01-01"
+            fecha_fin = "2023-01-01"
+            datos_json = {}
+            parametros_list = []
+            puntos_list = []
+            for p in puntos_medicion:
+                puntos_list.append(PuntoMedicion.objects.get(pk=p.id))
+            for parametro in parametros:
+                parametro = Parametro.objects.get(pk=parametro.id)
+                parametros_list.append(parametro)
+                datos_json[parametro.id] = []
+                for punto in puntos_medicion:
+
+                    punto = PuntoMedicion.objects.get(pk=punto.id)
+                    datos_n = Datos.objects.filter(punto_medicion=punto, parametro=parametro, fecha__range=[fecha_ini, fecha_fin],plantilla=plantilla)
+                    #order by fecha asc
+                    datos_n = datos_n.order_by('fecha')
+                    datos_json[parametro.id].append({
+                        'id' : punto.id,
+                        'punto' : punto.nombre,
+                        'data' : [],
+                    })
+                    #append to punto.nombre  dato.fecha and dato.valor to datos_json
+                    for dato in datos_n:
+                        datos_json[parametro.id][-1]['data'].append({
+                            'fecha' : dato.fecha.strftime('%Y-%m-%d'),
+                            'valor' : dato.valor,
+                        })
+            datos_json = json.dumps(datos_json)
+            #send json data
             context = {
                 "plantilla": plantilla,
                 "parametros": parametros,
@@ -249,10 +283,12 @@ def generar_informe(request, pk_plantilla):
                 "datos": datos,
                 "json_data": json_data,
                 "fecha": datetime.now().date(),
-                "rango_fecha": fecha_ini,
-                "user": request.user
+                "fecha_ini_tabla": fecha_ini_tabla,
+                "user": request.user,
+                "datos_json": datos_json,
             }
             #print(json_data)
+            return render(request, "pdf_template.html", context)
             open('pdf_template.html', 'w').write(render_to_string('result.html', context))
             pdf = html_to_pdf("pdf_template.html",context)
             return HttpResponse(pdf, content_type='application/pdf')

@@ -1,0 +1,53 @@
+<script>
+    var datos_json = JSON.parse('{{ datos_json|safe }}');
+    for (var key in datos_json) {
+        for (var i = 0; i < datos_json[key].length; i++) {
+            console.log(datos_json[key][i])
+            const ctx = document.getElementById(`jqxChart_${key}_${datos_json[key][i].id}`).getContext('2d');
+            var myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: datos_json[key][i].data.map(function (e) {
+                        return e.fecha
+                    }),
+                    datasets: [{
+                        label: datos_json[key][i].punto,
+                        data: datos_json[key][i].data.map(function (e) {
+                            return e.valor
+                        }),
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(153, 102, 255, 1)',
+                            'rgba(255, 159, 64, 1)'
+                        ],
+                        borderColor: [
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(153, 102, 255, 1)',
+                            'rgba(255, 159, 64, 1)'
+                        ],
+
+                        borderWidth: 1
+                    }]
+                },
+
+            });
+        }
+    }
+</script>
+{% for parametro in parametros_list  %}
+<h2>{{parametro.nombre}}</h2>
+<div>
+    {% for punto in puntos_list  %}
+    <div>
+        <canvas id='jqxChart_{{parametro.id}}_{{punto.id}}'></canvas>
+    </div>
+    {% endfor %}
+
+</div>
+{% endfor %}

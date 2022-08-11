@@ -52,7 +52,7 @@
     for (var key in datos_json) {
         //itera sobre los puntos de cada elemento
         for (var i = 0; i < datos_json[key].length; i++) {
-            console.log(datos_json[key][i])
+            // console.log(datos_json[key][i])
             const ctx = document.getElementById(`jqxChart_${key}_${datos_json[key][i].id}`).getContext('2d');
             //create chart type line with datos_json[key][i].data
             var myChart = new Chart(ctx, {

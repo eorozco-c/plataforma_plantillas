@@ -13,7 +13,7 @@
 </div>
 {% endfor %}
 {% endif %}
-<!-- form that consult fecha_ini and fecha_fin-->
+<!-- form that consult fecha_ini_tabla and fecha_fin-->
 <div class="card shadow mb-4">
     <div class="card-header py-3">
         <h6 class="m-0 font-weight-bold text-primary">Fecha para {{plantilla.nombre}}</h6>
@@ -21,14 +21,14 @@
     <div class="card-body">
         <form action="{% url 'datos:generar_informe' pk_plantilla=plantilla.id %}" target="_blank" method="POST">
             {% csrf_token %}
-            <!--container with 2 columns fecha_ini and fecha_fin-->
+            <!--container with 2 columns fecha_ini_tabla and fecha_fin-->
             <div class="container">
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="fecha_ini">Fecha </label>
-                            <input type="date" class="form-control" id="fecha_ini" name="fecha_ini"
-                                value="{{fecha_ini}}" required>
+                            <label for="fecha_ini_tabla">Fecha </label>
+                            <input type="date" class="form-control" id="fecha_ini_tabla" name="fecha_ini_tabla"
+                                value="{{fecha_ini_tabla}}" required>
                         </div>
                     </div>
 
@@ -55,8 +55,8 @@
             mm = '0' + mm;
         }
         today = yyyy + '-' + mm + '-' + dd;
-        $("#fecha_ini").attr("max", today);
-        $("#fecha_ini").attr("min", yyyy - 1 + '-' + mm + '-' + dd);
+        $("#fecha_ini_tabla").attr("max", today);
+        $("#fecha_ini_tabla").attr("min", yyyy - 1 + '-' + mm + '-' + dd);
     });
     //prevent defaul submit but consult data
     $("form").submit(function (e) {
