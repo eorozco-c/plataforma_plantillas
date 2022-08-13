@@ -15,7 +15,11 @@
 {% endif %}
 <!--FECHA HOY-->
 <!--- create form with horizontal is {{puntos_medicion}} and vertical is {{parametros}}-->
+<button type="button" class="btn btn-primary mb-4" data-bs-toggle="modal" data-bs-target="#modal">
+    Fechas Existentes
+</button>
 <div class="card shadow mb-4">
+
     <div class="card-body">
         <form action="{% url 'datos:ingreso_datos' pk_plantilla=plantilla.id %}" method="POST">
             {% csrf_token %}
@@ -56,6 +60,31 @@
             </div>
 
         </form>
+    </div>
+</div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="modal" tabindex="-1" notempty='not' aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog" notempty='not'>
+        <div class="modal-content" notempty='not'>
+            <div class="modal-header" notempty='not'>
+                <h5 class="modal-title " id="modalLabel" notempty='not'>Fechas existentes:</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" notempty='not'>
+                <div class="overflow-auto" style="height: 200px;">
+                    <ul>
+                        {% for fecha in fechas_existentes %}
+                        <li class="text-right">{{fecha.fecha}}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            <div class="modal-footer" notempty='not'>
+                <button id="close" type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock contenido %}

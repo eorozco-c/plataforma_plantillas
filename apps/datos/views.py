@@ -43,13 +43,15 @@ def ingreso_datos(request, pk_plantilla):
         parametros = Parametro.objects.filter(tipo=plantilla.tipo)
         puntos_medicion = PuntoMedicion.objects.filter(empresa=request.user.empresa,tipo=plantilla.tipo)
         datos = Datos.objects.filter(fecha=datetime.now().date(), plantilla=plantilla)
+        fechas_existentes = Datos.objects.filter(plantilla=plantilla).values('fecha').distinct().order_by('fecha')
         context = {
             'plantilla': plantilla,
             'parametros': parametros,
             'puntos_medicion': puntos_medicion,
             'datos': datos,
             'appname': 'Ingreso de datos',
-            'fecha' : datetime.now().date().strftime('%Y-%m-%d')    ,
+            'fecha' : datetime.now().date().strftime('%Y-%m-%d'),
+            'fechas_existentes': fechas_existentes,
         }
         return render(request, "datos/ingreso_datos.html", context)
     elif request.method == "POST":

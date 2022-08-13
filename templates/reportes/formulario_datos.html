@@ -10,6 +10,9 @@
 </div>
 <div class="row">
     <div class="col-xl-12 col-md-12 mb-12">
+        <button type="button" class="btn btn-primary mb-4" data-bs-toggle="modal" data-bs-target="#modal">
+            Fechas Existentes
+        </button>
         <div class="card shadow mb-4">
             <!-- Card Header - Dropdown -->
             <div class="card-header py-3">
@@ -32,7 +35,7 @@
                         </div>
                         <div class="form-group ">
                             <label for="plantilla" class="">Plantilla: </label>
-                            <select class="form-control" id="plantilla" name="plantilla">
+                            <select class="form-control" id="plantilla" name="plantilla" required>
                                 <option value="" selected disabled>Seleccione</option>
                                 {% for plantilla in plantillas %}
                                 <option value="{{ plantilla.id }}">{{ plantilla.nombre }}</option>
@@ -65,8 +68,27 @@
             </div>
         </div>
     </div>
+</div>
 
-
+<!-- Modal -->
+<div class="modal fade" id="modal" tabindex="-1" notempty='not' aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog" notempty='not'>
+        <div class="modal-content" notempty='not'>
+            <div class="modal-header" notempty='not'>
+                <h5 class="modal-title " id="modalLabel" notempty='not'>Fechas existentes:</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" notempty='not'>
+                <div class="overflow-auto" style="height: 200px;">
+                    <ul id="fechas_existentes">
+                    </ul>
+                </div>
+            </div>
+            <div class="modal-footer" notempty='not'>
+                <button id="close" type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock contenido %}
 {% block javascript %}
@@ -116,6 +138,7 @@
         //clear checkboxs
         $('#check_parametros').html('');
         $('#check_puntos').html('');
+        $('#fechas_existentes').html('');
         var plantilla = $('#plantilla').val();
         $.ajax({
             url: '{% url "reportes:get_form" %}',
@@ -125,6 +148,7 @@
             },
             success: function (data) {
                 //iterate over parametros and create checkbox input
+
                 $.each(data.parametros, function (index, parametro) {
                     $('#check_parametros').append(
                         '<div class="form-check">' +
@@ -148,6 +172,12 @@
                         .id + '">' +
                         punto.nombre + '</label>' +
                         '</div>'
+                    );
+                });
+                //iterate over fechas and create li element with date
+                $.each(data.fechas, function (index, fecha) {
+                    $('#fechas_existentes').append(
+                        '<li>' + fecha + '</li>'
                     );
                 });
             }

@@ -40,6 +40,7 @@ def get_form(request):
         plantilla = Plantilla.objects.get(pk=pk_plantilla)
         puntos = PuntoMedicion.objects.filter(tipo=plantilla.tipo, empresa=request.user.empresa)
         parametros = Parametro.objects.filter(tipo=plantilla.tipo)
+        fechas_existentes = Datos.objects.filter(plantilla=plantilla).values('fecha').distinct().order_by('fecha')
         datos_json = {}
         puntos_list = []
         parametros_list = []
@@ -55,6 +56,11 @@ def get_form(request):
             })
         datos_json['puntos'] = puntos_list
         datos_json['parametros'] = parametros_list
+        #convert fechas_existentes to json
+        fechas_existentes_json = []
+        for fecha in fechas_existentes:
+            fechas_existentes_json.append(fecha['fecha'])
+        datos_json['fechas'] = fechas_existentes_json
 
         return JsonResponse(datos_json, safe=False)
     return JsonResponse({})
