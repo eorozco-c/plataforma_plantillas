@@ -71,13 +71,16 @@
         </table>
         <div id="notas">
             <div id="form_notas">
-                <legend>Ingrese notas:</legend>
+                <legend>Ingrese Analisis de Datos:</legend>
                 <textarea class="form-control" id="textarea_notas" rows="3"></textarea>
-                <button class="btn btn-primary" id="btn-notas">Agregar Nota</button>
+                <button class="btn btn-primary float-end mt-2" id="btn-notas">Agregar</button>
             </div>
             <div id="lista_notas" class="mt-3">
                 <h1>Notas:</h1>
                 <ul>
+                    {% for nota in notas  %}
+                    <li>{{nota.nota}}</li>
+                    {% endfor %}
                 </ul>
             </div>
         </div>
@@ -131,7 +134,7 @@
             </tr>
         </table>
 
-        <table width="50%" border="0" cellspacing="0" cellpadding="0" class="mx-auto">
+        <table width="50%" border="0" cellspacing="0" cellpadding="0" class="mx-auto" style="page-break-after: always;">
             <tr>
                 <td colspan="2">&nbsp;</td>
             </tr>
@@ -201,9 +204,8 @@
             <div class="col-xl-12 col-md-12 mb-12">
                 {% for parametro in parametros_list  %}
                 <div class="page_fix">
-                    <h2 class="text-center p-2 mt-3 display-3">{{parametro.nombre}}</h2>
+                    <h2 class="text-center p-2 mt-3 display-4">{{parametro.nombre}}</h2>
                     <div class="row">
-
                         {% for punto in puntos_list  %}
                         <div class="col-xl-4 col-md-6 mb-4">
                             <div class="card border-left-primary shadow h-100 py-2">

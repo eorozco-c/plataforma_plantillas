@@ -63,7 +63,6 @@ def borrar_nota(request, pk_nota):
     nota.delete()
     return redirect('datos:ingreso_datos', plantilla, fecha)
 
-
 # Create your views here.
 @login_required(login_url="/")
 def ingreso_datos(request, pk_plantilla,get_fecha=None):
@@ -332,6 +331,7 @@ def generar_informe(request, pk_plantilla):
                         })
             datos_json = json.dumps(datos_json)
             #send json data
+            notas = NotasDatos.objects.filter(plantilla=plantilla, fecha=fecha_ini_tabla)
             context = {
                 "plantilla": plantilla,
                 "parametros": parametros,
@@ -345,12 +345,13 @@ def generar_informe(request, pk_plantilla):
                 "fecha_ini": fecha_ini,
                 "fecha_fin": fecha_fin,
                 "user": request.user,
+                "notas": notas,
                 "datos_json": datos_json,
             }
             #print(json_data)
             return render(request, "pdf_template.html", context)
-            open('pdf_template.html', 'w').write(render_to_string('result.html', context))
-            pdf = html_to_pdf("pdf_template.html",context)
-            return HttpResponse(pdf, content_type='application/pdf')
+            # open('pdf_template.html', 'w').write(render_to_string('result.html', context))
+            # pdf = html_to_pdf("pdf_template.html",context)
+            # return HttpResponse(pdf, content_type='application/pdf')
     else:
         return redirect('plantillas:index')
