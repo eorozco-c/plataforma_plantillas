@@ -21,12 +21,12 @@
 <div class="card shadow mb-4">
 
     <div class="card-body">
-        <form action="{% url 'datos:ingreso_datos' pk_plantilla=plantilla.id %}" method="POST">
+        <form action="{% url 'datos:ingreso_datos' pk_plantilla=plantilla.id get_fecha=None %}" method="POST">
             {% csrf_token %}
             <div class="form-group col-xl-4">
                 <label for="fecha">Fecha </label>
-                <input type="date" class="form-control" id="fecha" name="fecha" value="{{fecha}}" max="{{fecha}}"
-                    required>
+                <input type="date" class="form-control" id="fecha" name="fecha" value="{{fecha}}"
+                    max="{% now "Y-m-d" %}" required>
             </div>
 
             <!--horizontal is bucle ti {{puntos_medicion}}-->
@@ -54,8 +54,22 @@
                     {% endfor %}
                 </tbody>
             </table>
+            <div class="my-4">
+                <label for="text_notas">Agregar analisis de datos:</label>
+                <textarea class="form-control" name="text_notas" id="text_notas" cols="30" rows="5"></textarea>
+                <button id="agregar_nota" class="btn btn-primary mt-2 float-end">Agregar</button>
+            </div>
+            <div>
+                <ul id="notas">
+                    {% for nota in notas  %}
+                    <li id="{{nota.id}}">{{nota.nota}} - <a href="{% url 'datos:borrar_nota' pk_nota=nota.id %}">
+                            <small>Eliminar</small></a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
             <!--button submit in center-->
-            <div class="text-center">
+            <div class=" text-center">
                 <button type="submit" class="btn btn-primary">Guardar</button>
             </div>
 
@@ -102,6 +116,7 @@
 
     //if fecha change, get the data from the server and populate the table:
     $('#fecha').change(function () {
+        $('#notas').empty();
         var fecha = $('#fecha').val();
         var url = '{% url "datos:get_datos" pk_plantilla=plantilla.id %}';
         $.ajax({
@@ -112,21 +127,56 @@
             },
             success: function (data) {
                 //if data is empty values
-                if (data.length == 0) {
+                if (data['datos'].length == 0) {
                     $('.value').val('');
                     $('small').remove();
                 }
                 //with data populate the table with the data
-                for (var i = 0; i < data.length; i++) {
-                    $('#' + data[i].punto_medicion + '_' + data[i].parametro).val(data[i]
+                for (var i = 0; i < data['datos'].length; i++) {
+                    $('#' + data['datos'][i].punto_medicion + '_' + data['datos'][i].parametro).val(
+                        data['datos'][i]
                         .valor);
                     //remove the <small> and add it again with the new user
-                    $('#' + data[i].punto_medicion + '_' + data[i].parametro).next().remove();
-                    $('#' + data[i].punto_medicion + '_' + data[i].parametro).after(
-                        '<small>' + data[i].usuario + '</small>');
+                    $('#' + data['datos'][i].punto_medicion + '_' + data['datos'][i].parametro)
+                        .next().remove();
+                    $('#' + data['datos'][i].punto_medicion + '_' + data['datos'][i].parametro)
+                        .after(
+                            '<small>' + data['datos'][i].usuario + '</small>');
+                }
+                //add notas from data['notas']
+                for (var i = 0; i < data['notas'].length; i++) {
+                    $('#notas').append('<li id=' + data['notas'][i].id + '>' + data['notas'][i]
+                        .nota +
+                        '- <a href="/datos/borrar_nota/' + data['notas'][i].id +
+                        '"> <small>Eliminar</small></a> </li>'
+                    );
+
                 }
             }
         });
+    });
+
+    //if the user click on the button add_nota, add the textarea to the ul
+    $('#agregar_nota').click(function () {
+        //prevent default
+        event.preventDefault();
+        $.ajax({
+            url: '{% url "datos:agregar_nota" pk_plantilla=plantilla.id %}',
+            type: 'GET',
+            data: {
+                nota: $('#text_notas').val(),
+                fecha: $('#fecha').val()
+            },
+            success: function (data) {
+                console.log(data);
+                $('#notas').append('<li id=' + data.id + '>' + data.nota +
+                    '- <a href="/datos/borrar_nota/' + data.id +
+                    '"> <small>Eliminar</small></a> </li>'
+                );
+
+            }
+        });
+        $('#text_notas').val('');
     });
 </script>
 {% endblock javascript %}

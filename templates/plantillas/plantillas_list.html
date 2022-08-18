@@ -36,8 +36,8 @@
                         Editar</a>
                     {% endif %}
                     <a class="btn btn-danger btn-sm text-light border border-dark m-1"
-                        href="{% url 'datos:ingreso_datos' pk_plantilla=plantilla.id %}" id="add_datos"><i
-                            class="fas fa-plus-circle"></i> Datos</a>
+                        href="{% url 'datos:ingreso_datos' pk_plantilla=plantilla.id get_fecha=None %}"
+                        id="add_datos"><i class="fas fa-plus-circle"></i> Datos</a>
                     <!--Generar informe-->
                     <a class="btn btn-success btn-sm text-light border border-dark m-1"
                         href="{% url 'datos:generar_informe' pk_plantilla=plantilla.id %}" id="add_datos"><i

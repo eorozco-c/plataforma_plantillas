@@ -2,7 +2,7 @@ from django.conf import settings
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import Datos
+from .models import Datos, NotasDatos
 from apps.plantillas.models import Plantilla
 from apps.parametros.models import Parametro
 from apps.puntos_medicion.models import PuntoMedicion
@@ -22,6 +22,7 @@ def get_datos(request, pk_plantilla):
     fecha = request.GET.get('fecha')
     plantilla = Plantilla.objects.get(pk=pk_plantilla)
     datos = Datos.objects.filter(plantilla=plantilla, fecha=fecha)
+    notas = NotasDatos.objects.filter(plantilla=plantilla, fecha=fecha)
     datos_json = []
     for dato in datos:
         datos_json.append({
@@ -32,26 +33,60 @@ def get_datos(request, pk_plantilla):
             'parametro': dato.parametro.id,
             'usuario': dato.usuario.username,
         })
-    return JsonResponse(datos_json, safe=False)
+    notas_json = []
+    for nota in notas:
+        json = {
+            'id': nota.id,
+            'fecha': nota.fecha.strftime('%Y-%m-%d'),
+            'nota': nota.nota,
+            'usuario': nota.usuario.username,
+        }
+        notas_json.append(json)
+    return JsonResponse({'datos': datos_json, 'notas': notas_json}, safe=False)
+##############################################################################
+
+@login_required(login_url='/')
+def agregar_nota(request, pk_plantilla):
+    plantilla = Plantilla.objects.get(pk=pk_plantilla)
+    fecha = request.GET.get('fecha')
+    nota = request.GET.get('nota')
+    usuario = request.user
+    nota_datos = NotasDatos(plantilla=plantilla, fecha=fecha, nota=nota, usuario=usuario)
+    nota_datos.save()
+    return JsonResponse({'status': 'ok', 'id': nota_datos.id, 'nota' : nota_datos.nota}, safe=False)
+
+@login_required(login_url='/')
+def borrar_nota(request, pk_nota):
+    nota = NotasDatos.objects.get(pk=pk_nota)
+    plantilla = nota.plantilla.id
+    fecha = nota.fecha
+    nota.delete()
+    return redirect('datos:ingreso_datos', plantilla, fecha)
 
 
 # Create your views here.
 @login_required(login_url="/")
-def ingreso_datos(request, pk_plantilla):
+def ingreso_datos(request, pk_plantilla,get_fecha=None):
     if request.method == "GET":
+        if get_fecha == None or get_fecha == 'None':
+            fecha = datetime.now().date().strftime('%Y-%m-%d')
+        else:
+            fecha = get_fecha
         plantilla = Plantilla.objects.get(id=pk_plantilla)
         parametros = Parametro.objects.filter(tipo=plantilla.tipo)
         puntos_medicion = PuntoMedicion.objects.filter(empresa=request.user.empresa,tipo=plantilla.tipo)
-        datos = Datos.objects.filter(fecha=datetime.now().date(), plantilla=plantilla)
+        datos = Datos.objects.filter(fecha=fecha, plantilla=plantilla)
         fechas_existentes = Datos.objects.filter(plantilla=plantilla).values('fecha').distinct().order_by('fecha')
+        notas = NotasDatos.objects.filter(plantilla=plantilla, fecha=fecha)
         context = {
             'plantilla': plantilla,
             'parametros': parametros,
             'puntos_medicion': puntos_medicion,
             'datos': datos,
             'appname': 'Ingreso de datos',
-            'fecha' : datetime.now().date().strftime('%Y-%m-%d'),
+            'fecha' : fecha,
             'fechas_existentes': fechas_existentes,
+            'notas': notas,
         }
         return render(request, "datos/ingreso_datos.html", context)
     elif request.method == "POST":
@@ -93,9 +128,9 @@ def ingreso_datos(request, pk_plantilla):
                     datos.usuario = request.user
                     datos.save()
         messages.success(request, "Datos ingresados correctamente")            
-        return redirect('datos:ingreso_datos', pk_plantilla=plantilla.id)
+        return redirect('datos:ingreso_datos', pk_plantilla=plantilla.id, get_fecha=None)
     else:
-        return redirect('datos:ingreso_datos', pk_plantilla=plantilla.id)
+        return redirect('datos:ingreso_datos', pk_plantilla=plantilla.id,get_fecha=None)
 
 @login_required(login_url="/")
 def generar_informe(request, pk_plantilla):

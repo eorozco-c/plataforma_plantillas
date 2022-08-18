@@ -13,3 +13,12 @@ class Datos(models.Model):
     valor = models.FloatField(null=True, blank=True)
     fecha = models.DateField()
     updated = models.DateTimeField(auto_now=True)
+
+class NotasDatos(models.Model):
+    plantilla = models.ForeignKey(Plantilla, on_delete=models.CASCADE)
+    fecha = models.DateField()
+    nota = models.CharField(max_length=255)
+    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
