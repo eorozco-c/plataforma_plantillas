@@ -1,13 +1,14 @@
+* {
+  -webkit-print-color-adjust: exact !important;   /* Chrome, Safari, Edge */
+  color-adjust: exact !important;                 /*Firefox*/
+}
+
 .centrar {
   padding-top: 11%;
 }
 
 .body_login {
-  background-image: url("/static/master/img/fondos/new/der_login.png") ;
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-position: center;
-  background-attachment: fixed;
+ background-color: black;
 }
 
 .special-card {
@@ -40,7 +41,6 @@
 }
 
 .bg-corus-sidebar {
-  /* background: url(/static/master/img/fondos/new/cumulusbackground.svg) no-repeat center center fixed; */
   background-color: black;
 }
 
