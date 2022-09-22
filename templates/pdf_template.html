@@ -70,21 +70,6 @@
                 {% endfor %}
             </tbody>
         </table>
-        <div id="notas">
-            <div id="form_notas">
-                <legend>Ingrese Analisis de Datos:</legend>
-                <textarea class="form-control" id="textarea_notas" rows="3"></textarea>
-                <button class="btn btn-primary float-end mt-2" id="btn-notas">Agregar</button>
-            </div>
-            <div id="lista_notas" class="mt-3">
-                <h1>Notas:</h1>
-                <ul>
-                    {% for nota in notas  %}
-                    <li>{{nota.nota}}</li>
-                    {% endfor %}
-                </ul>
-            </div>
-        </div>
 
         {% if user.is_staff %}
         <table width="100%" border="0" cellspacing="0" cellpadding="0">
@@ -199,6 +184,22 @@
         </table>
 
         {% endif %}
+
+        <div id="notas">
+            <div id="form_notas">
+                <legend>Ingrese Analisis de Datos:</legend>
+                <textarea class="form-control" id="textarea_notas" rows="3"></textarea>
+                <button class="btn btn-primary float-end mt-2" id="btn-notas">Agregar</button>
+            </div>
+            <div id="lista_notas" class="mt-3">
+                <h1>Notas:</h1>
+                <ul>
+                    {% for nota in notas  %}
+                    <li>{{nota.nota}}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
 
         <!--new table with images-->
         <div class="row justify-content-center mt-5">

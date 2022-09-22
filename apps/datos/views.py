@@ -174,162 +174,165 @@ def generar_informe(request, pk_plantilla):
                 messages.success(request, 'No hay datos para la fecha seleccionada.',extra_tags='danger')
                 return redirect('datos:generar_informe', pk_plantilla=plantilla.id)
             json_data = []
-            #obtain all valores from datos when parametro contains "conductividad"
-            conductividad = datos.filter(parametro__nombre__icontains="conductividad")
-            #count all puntos_medicion from conductividad when nombre contains "caldera"
-            calderas = conductividad.filter(punto_medicion__nombre__icontains="caldera")
-            alimentacion = conductividad.get(punto_medicion__nombre__icontains="alimentacion")
-            factor_conductividad = {"name": "Factor de conductividad", "data": []}
-            for caldera in calderas:
-                factor_conductividad["data"].append({"name": caldera.punto_medicion.nombre, "valor": round(caldera.valor/alimentacion.valor, 2)})
-            json_data.append(factor_conductividad)
-            cloruros = datos.filter(parametro__nombre__icontains="cloruros")
-            calderas = cloruros.filter(punto_medicion__nombre__icontains="caldera")
-            alimentacion = cloruros.get(punto_medicion__nombre__icontains="alimentacion")
-            factor_clorus = {"name": "Factor de cloruros", "data": []}
-            for caldera in calderas:
-                factor_clorus["data"].append({"name": caldera.punto_medicion.nombre, "valor": round(caldera.valor/alimentacion.valor, 2)})
-            json_data.append(factor_clorus)
-            silice = datos.filter(parametro__nombre__icontains="silice")
-            calderas = silice.filter(punto_medicion__nombre__icontains="caldera")
-            alimentacion = silice.get(punto_medicion__nombre__icontains="alimentacion")
-            factor_silice = {"name": "Factor de silice", "data": []}
-            for caldera in calderas:
-                factor_silice["data"].append({"name": caldera.punto_medicion.nombre, "valor": round(caldera.valor/alimentacion.valor, 2)})
-            json_data.append(factor_silice)
-            dureza_total = datos.filter(parametro__nombre__icontains="dureza total")
-            alimentacion_dureza = dureza_total.get(punto_medicion__nombre__icontains="alimentacion")
-            hierro = datos.filter(parametro__nombre__icontains="hierro")
-            alimentacion_hierro = hierro.get(punto_medicion__nombre__icontains="alimentacion")
-            silice = datos.filter(parametro__nombre__icontains="silice")
-            alimentacion_silice = silice.get(punto_medicion__nombre__icontains="alimentacion")
-            fc_conductividad = {
-                "name": "FC conductividad", 
-                "data": [
-                    {"name": "dureza_total", "data": []}, 
-                    {"name": "hierro_teorico", "data": []}, 
-                    {"name": "silice_teorico", "data": []}
-                ]}
-            #iterate valor of factor_conductividad
-            for valor in factor_conductividad["data"]:
-                # multiplicate valor of factor_conductividad by valor of alimentacion_dureza and append to fc_conductividad
-                fc_conductividad["data"][0]["data"].append({"name": valor["name"], "valor": round(valor["valor"]*alimentacion_dureza.valor, 2)})
-                #multiplicate valor of factor_conductividad by valor of alimentacion_hierro and append to fc_conductividad
-                fc_conductividad["data"][1]["data"].append({"name": valor["name"], "valor": round(valor["valor"]*alimentacion_hierro.valor, 2)})
-                #multiplicate valor of factor_conductividad by valor of alimentacion_silice and append to fc_conductividad
-                fc_conductividad["data"][2]["data"].append({"name": valor["name"], "valor": round(valor["valor"]*alimentacion_silice.valor, 2)})
-            dureza_caldera = dureza_total.filter(punto_medicion__nombre__icontains="caldera")
-            #iterate valor of dureza_caldera
-            for valor_dureza in dureza_caldera:
-                # print(valor_dureza.punto_medicion.nombre, valor_dureza.valor)
-                for fc in fc_conductividad["data"]:
-                    # print(fc)
-                    #iterate on fc["data"] when name is dureza_total
-                    if fc["name"] == "dureza_total":
-                        for fc_valor in fc["data"]:
-                            if fc_valor["name"] == valor_dureza.punto_medicion.nombre:
-                                #if fc_valor["valor"] < valor_dureza.valor add status ok to fc_valor
-                                if fc_valor["valor"] < valor_dureza.valor:
-                                    fc_valor["status"] = "ok"
-                                else:
-                                    fc_valor["status"] = "alerta"
-            hierro_caldera = hierro.filter(punto_medicion__nombre__icontains="caldera")
-            #iterate valor of hierro_caldera
-            for valor_hierro in hierro_caldera:
-                # print(valor_hierro.punto_medicion.nombre, valor_hierro.valor)
-                for fc in fc_conductividad["data"]:
-                    # print(fc)
-                    #iterate on fc["data"] when name is hierro_teorico
-                    if fc["name"] == "hierro_teorico":
-                        for fc_valor in fc["data"]:
-                            if fc_valor["name"] == valor_hierro.punto_medicion.nombre:
-                                #if fc_valor["valor"] > valor_hierro.valor add status ok to fc_valor
-                                if fc_valor["valor"] > valor_hierro.valor:
-                                    fc_valor["status"] = "ok"
-                                else:
-                                    fc_valor["status"] = "alerta"
-            silice_caldera = silice.filter(punto_medicion__nombre__icontains="caldera")
-            #iterate valor of silice_caldera
-            for valor_silice in silice_caldera:
-                # print(valor_silice.punto_medicion.nombre, valor_silice.valor)
-                for fc in fc_conductividad["data"]:
-                    # print(fc)
-                    #iterate on fc["data"] when name is silice_teorico
-                    if fc["name"] == "silice_teorico":
-                        for fc_valor in fc["data"]:
-                            if fc_valor["name"] == valor_silice.punto_medicion.nombre:
-                                #if fc_valor["valor"] > valor_silice.valor add status ok to fc_valor
-                                if fc_valor["valor"] > valor_silice.valor:
-                                    fc_valor["status"] = "ok"
-                                else:
-                                    fc_valor["status"] = "alerta"
-            json_data.append(fc_conductividad)
-            fc_cloruros = {
-                "name": "FC CLORUROS", 
-                "data": [
-                    {"name": "dureza_total", "data": []}, 
-                    {"name": "hierro_teorico", "data": []}, 
-                    {"name": "silice_teorico", "data": []}
-                ]}
-            #iterate valor of factor_clorus
-            for valor in factor_clorus["data"]:
-                # multiplicate valor of factor_clorus by valor of alimentacion_dureza and append to fc_cloruros
-                fc_cloruros["data"][0]["data"].append({"name": valor["name"], "valor": round(valor["valor"]*alimentacion_dureza.valor, 2), "status": "ok"})
-                #multiplicate valor of factor_clorus by valor of alimentacion_hierro and append to fc_cloruros
-                fc_cloruros["data"][1]["data"].append({"name": valor["name"], "valor": round(valor["valor"]*alimentacion_hierro.valor, 2), "status": "ok"})
-                #multiplicate valor of factor_clorus by valor of alimentacion_silice and append to fc_cloruros
-                fc_cloruros["data"][2]["data"].append({"name": valor["name"], "valor": round(valor["valor"]*alimentacion_silice.valor, 2), "status": "ok"})
+            try:
+                #obtain all valores from datos when parametro contains "conductividad"
+                conductividad = datos.filter(parametro__nombre__icontains="conductividad")
+                #count all puntos_medicion from conductividad when nombre contains "caldera"
+                calderas = conductividad.filter(punto_medicion__nombre__icontains="caldera")
+                alimentacion = conductividad.get(punto_medicion__nombre__icontains="alimentacion")
+                factor_conductividad = {"name": "Factor de conductividad", "data": []}
+                for caldera in calderas:
+                    factor_conductividad["data"].append({"name": caldera.punto_medicion.nombre, "valor": round(caldera.valor/alimentacion.valor, 2)})
+                json_data.append(factor_conductividad)
+                cloruros = datos.filter(parametro__nombre__icontains="cloruros")
+                calderas = cloruros.filter(punto_medicion__nombre__icontains="caldera")
+                alimentacion = cloruros.get(punto_medicion__nombre__icontains="alimentacion")
+                factor_clorus = {"name": "Factor de cloruros", "data": []}
+                for caldera in calderas:
+                    factor_clorus["data"].append({"name": caldera.punto_medicion.nombre, "valor": round(caldera.valor/alimentacion.valor, 2)})
+                json_data.append(factor_clorus)
+                silice = datos.filter(parametro__nombre__icontains="silice")
+                calderas = silice.filter(punto_medicion__nombre__icontains="caldera")
+                alimentacion = silice.get(punto_medicion__nombre__icontains="alimentacion")
+                factor_silice = {"name": "Factor de silice", "data": []}
+                for caldera in calderas:
+                    factor_silice["data"].append({"name": caldera.punto_medicion.nombre, "valor": round(caldera.valor/alimentacion.valor, 2)})
+                json_data.append(factor_silice)
+                dureza_total = datos.filter(parametro__nombre__icontains="dureza total")
+                alimentacion_dureza = dureza_total.get(punto_medicion__nombre__icontains="alimentacion")
+                hierro = datos.filter(parametro__nombre__icontains="hierro")
+                alimentacion_hierro = hierro.get(punto_medicion__nombre__icontains="alimentacion")
+                silice = datos.filter(parametro__nombre__icontains="silice")
+                alimentacion_silice = silice.get(punto_medicion__nombre__icontains="alimentacion")
+                fc_conductividad = {
+                    "name": "FC conductividad", 
+                    "data": [
+                        {"name": "dureza_total", "data": []}, 
+                        {"name": "hierro_teorico", "data": []}, 
+                        {"name": "silice_teorico", "data": []}
+                    ]}
+                #iterate valor of factor_conductividad
+                for valor in factor_conductividad["data"]:
+                    # multiplicate valor of factor_conductividad by valor of alimentacion_dureza and append to fc_conductividad
+                    fc_conductividad["data"][0]["data"].append({"name": valor["name"], "valor": round(valor["valor"]*alimentacion_dureza.valor, 2)})
+                    #multiplicate valor of factor_conductividad by valor of alimentacion_hierro and append to fc_conductividad
+                    fc_conductividad["data"][1]["data"].append({"name": valor["name"], "valor": round(valor["valor"]*alimentacion_hierro.valor, 2)})
+                    #multiplicate valor of factor_conductividad by valor of alimentacion_silice and append to fc_conductividad
+                    fc_conductividad["data"][2]["data"].append({"name": valor["name"], "valor": round(valor["valor"]*alimentacion_silice.valor, 2)})
+                dureza_caldera = dureza_total.filter(punto_medicion__nombre__icontains="caldera")
+                #iterate valor of dureza_caldera
+                for valor_dureza in dureza_caldera:
+                    # print(valor_dureza.punto_medicion.nombre, valor_dureza.valor)
+                    for fc in fc_conductividad["data"]:
+                        # print(fc)
+                        #iterate on fc["data"] when name is dureza_total
+                        if fc["name"] == "dureza_total":
+                            for fc_valor in fc["data"]:
+                                if fc_valor["name"] == valor_dureza.punto_medicion.nombre:
+                                    #if fc_valor["valor"] < valor_dureza.valor add status ok to fc_valor
+                                    if fc_valor["valor"] < valor_dureza.valor:
+                                        fc_valor["status"] = "ok"
+                                    else:
+                                        fc_valor["status"] = "alerta"
+                hierro_caldera = hierro.filter(punto_medicion__nombre__icontains="caldera")
+                #iterate valor of hierro_caldera
+                for valor_hierro in hierro_caldera:
+                    # print(valor_hierro.punto_medicion.nombre, valor_hierro.valor)
+                    for fc in fc_conductividad["data"]:
+                        # print(fc)
+                        #iterate on fc["data"] when name is hierro_teorico
+                        if fc["name"] == "hierro_teorico":
+                            for fc_valor in fc["data"]:
+                                if fc_valor["name"] == valor_hierro.punto_medicion.nombre:
+                                    #if fc_valor["valor"] > valor_hierro.valor add status ok to fc_valor
+                                    if fc_valor["valor"] > valor_hierro.valor:
+                                        fc_valor["status"] = "ok"
+                                    else:
+                                        fc_valor["status"] = "alerta"
+                silice_caldera = silice.filter(punto_medicion__nombre__icontains="caldera")
+                #iterate valor of silice_caldera
+                for valor_silice in silice_caldera:
+                    # print(valor_silice.punto_medicion.nombre, valor_silice.valor)
+                    for fc in fc_conductividad["data"]:
+                        # print(fc)
+                        #iterate on fc["data"] when name is silice_teorico
+                        if fc["name"] == "silice_teorico":
+                            for fc_valor in fc["data"]:
+                                if fc_valor["name"] == valor_silice.punto_medicion.nombre:
+                                    #if fc_valor["valor"] > valor_silice.valor add status ok to fc_valor
+                                    if fc_valor["valor"] > valor_silice.valor:
+                                        fc_valor["status"] = "ok"
+                                    else:
+                                        fc_valor["status"] = "alerta"
+                json_data.append(fc_conductividad)
+                fc_cloruros = {
+                    "name": "FC CLORUROS", 
+                    "data": [
+                        {"name": "dureza_total", "data": []}, 
+                        {"name": "hierro_teorico", "data": []}, 
+                        {"name": "silice_teorico", "data": []}
+                    ]}
+                #iterate valor of factor_clorus
+                for valor in factor_clorus["data"]:
+                    # multiplicate valor of factor_clorus by valor of alimentacion_dureza and append to fc_cloruros
+                    fc_cloruros["data"][0]["data"].append({"name": valor["name"], "valor": round(valor["valor"]*alimentacion_dureza.valor, 2), "status": "ok"})
+                    #multiplicate valor of factor_clorus by valor of alimentacion_hierro and append to fc_cloruros
+                    fc_cloruros["data"][1]["data"].append({"name": valor["name"], "valor": round(valor["valor"]*alimentacion_hierro.valor, 2), "status": "ok"})
+                    #multiplicate valor of factor_clorus by valor of alimentacion_silice and append to fc_cloruros
+                    fc_cloruros["data"][2]["data"].append({"name": valor["name"], "valor": round(valor["valor"]*alimentacion_silice.valor, 2), "status": "ok"})
 
 
-            json_data.append(fc_cloruros)
-            fc_silice = {
-                "name": "FC SILICE",
-                "data": [
-                    {"name": "dureza_total", "data": []},
-                    {"name": "hierro_teorico", "data": []},
-                    {"name": "silice_teorico", "data": []}
-                ]}
-            #iterate valor of factor_silice
-            for valor in factor_silice["data"]:
-                # multiplicate valor of factor_silice by valor of alimentacion_dureza and append to fc_silice
-                fc_silice["data"][0]["data"].append({"name": valor["name"], "valor": round(valor["valor"]*alimentacion_dureza.valor, 2), "status": "ok"})
-                #multiplicate valor of factor_silice by valor of alimentacion_hierro and append to fc_silice
-                fc_silice["data"][1]["data"].append({"name": valor["name"], "valor": round(valor["valor"]*alimentacion_hierro.valor, 2), "status": "ok"})
-                #multiplicate valor of factor_silice by valor of alimentacion_silice and append to fc_silice
-                fc_silice["data"][2]["data"].append({"name": valor["name"], "valor": round(valor["valor"]*alimentacion_silice.valor, 2), "status": "ok"})
-            json_data.append(fc_silice)
-            #generate pdf file
-            plantilla = Plantilla.objects.get(id=pk_plantilla)
-            parametros = Parametro.objects.filter(tipo=plantilla.tipo)
-            puntos_medicion = PuntoMedicion.objects.filter(empresa=request.user.empresa, tipo=plantilla.tipo)
-            datos_n = Datos.objects.filter(fecha=fecha_ini_tabla,plantilla=plantilla)
-            datos_json = {}
-            parametros_list = []
-            puntos_list = []
-            for p in puntos_form:
-                puntos_list.append(PuntoMedicion.objects.get(pk=p))
-            for parametro in parametros_form:
-                parametro = Parametro.objects.get(pk=parametro)
-                parametros_list.append(parametro)
-                datos_json[parametro.id] = []
-                for punto in puntos_form:
+                json_data.append(fc_cloruros)
+                fc_silice = {
+                    "name": "FC SILICE",
+                    "data": [
+                        {"name": "dureza_total", "data": []},
+                        {"name": "hierro_teorico", "data": []},
+                        {"name": "silice_teorico", "data": []}
+                    ]}
+                #iterate valor of factor_silice
+                for valor in factor_silice["data"]:
+                    # multiplicate valor of factor_silice by valor of alimentacion_dureza and append to fc_silice
+                    fc_silice["data"][0]["data"].append({"name": valor["name"], "valor": round(valor["valor"]*alimentacion_dureza.valor, 2), "status": "ok"})
+                    #multiplicate valor of factor_silice by valor of alimentacion_hierro and append to fc_silice
+                    fc_silice["data"][1]["data"].append({"name": valor["name"], "valor": round(valor["valor"]*alimentacion_hierro.valor, 2), "status": "ok"})
+                    #multiplicate valor of factor_silice by valor of alimentacion_silice and append to fc_silice
+                    fc_silice["data"][2]["data"].append({"name": valor["name"], "valor": round(valor["valor"]*alimentacion_silice.valor, 2), "status": "ok"})
+                json_data.append(fc_silice)
+                #generate pdf file
+                plantilla = Plantilla.objects.get(id=pk_plantilla)
+                parametros = Parametro.objects.filter(tipo=plantilla.tipo)
+                puntos_medicion = PuntoMedicion.objects.filter(empresa=request.user.empresa, tipo=plantilla.tipo)
+                datos_n = Datos.objects.filter(fecha=fecha_ini_tabla,plantilla=plantilla)
+                datos_json = {}
+                parametros_list = []
+                puntos_list = []
+                for p in puntos_form:
+                    puntos_list.append(PuntoMedicion.objects.get(pk=p))
+                for parametro in parametros_form:
+                    parametro = Parametro.objects.get(pk=parametro)
+                    parametros_list.append(parametro)
+                    datos_json[parametro.id] = []
+                    for punto in puntos_form:
 
-                    punto = PuntoMedicion.objects.get(pk=punto)
-                    datos_n = Datos.objects.filter(punto_medicion=punto, parametro=parametro, fecha__range=[fecha_ini, fecha_fin],plantilla=plantilla)
-                    #order by fecha asc
-                    datos_n = datos_n.order_by('fecha')
-                    datos_json[parametro.id].append({
-                        'id' : punto.id,
-                        'punto' : punto.nombre,
-                        'data' : [],
-                    })
-                    #append to punto.nombre  dato.fecha and dato.valor to datos_json
-                    for dato in datos_n:
-                        datos_json[parametro.id][-1]['data'].append({
-                            'fecha' : dato.fecha.strftime('%Y-%m-%d'),
-                            'valor' : dato.valor,
+                        punto = PuntoMedicion.objects.get(pk=punto)
+                        datos_n = Datos.objects.filter(punto_medicion=punto, parametro=parametro, fecha__range=[fecha_ini, fecha_fin],plantilla=plantilla)
+                        #order by fecha asc
+                        datos_n = datos_n.order_by('fecha')
+                        datos_json[parametro.id].append({
+                            'id' : punto.id,
+                            'punto' : punto.nombre,
+                            'data' : [],
                         })
-            datos_json = json.dumps(datos_json)
+                        #append to punto.nombre  dato.fecha and dato.valor to datos_json
+                        for dato in datos_n:
+                            datos_json[parametro.id][-1]['data'].append({
+                                'fecha' : dato.fecha.strftime('%Y-%m-%d'),
+                                'valor' : dato.valor,
+                            })
+                datos_json = json.dumps(datos_json)
+            except:
+                messages
             #send json data
             notas = NotasDatos.objects.filter(plantilla=plantilla, fecha=fecha_ini_tabla)
             context = {
