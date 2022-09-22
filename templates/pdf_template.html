@@ -32,6 +32,9 @@
             </div>
             <h3 class="mt-3">Información de cliente:</h3>
             <p class="fw-bold m-0">{{user.empresa}}</p>
+            {% if user.empresa.contacto != "Sin Contacto" %}
+            <p class="m-0">{{user.empresa.contacto}}</p>
+            {% endif %}
             <p class="m-0">{{user.empresa.direccion}}</p>
             <p class="m-0">{{user.empresa.telefono}}</p>
             <p class="m-0">{{user.empresa.email}}</p>

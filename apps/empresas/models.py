@@ -4,6 +4,7 @@ from django.db import models
 class Empresa(models.Model):
     nombre = models.CharField(max_length=100, unique=True)
     logo = models.TextField(default="/static/master/img/logo.png")
+    contacto = models.CharField(max_length=100, default="Sin Contacto")
     direccion = models.CharField(max_length=100, default="")
     telefono = models.CharField(max_length=20, default="")
     email = models.EmailField(max_length=100, default="")

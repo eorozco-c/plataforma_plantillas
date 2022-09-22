@@ -8,7 +8,7 @@ class FormularioEmpresa(forms.ModelForm):
 
     class Meta:
         model = Empresa
-        fields = ["nombre", "direccion", "telefono", "email", "rut"]
+        fields = ["nombre", "direccion", "telefono", "email", "rut", "contacto"]
 
     def clean_nombre(self):
         nombre = self.cleaned_data["nombre"]
