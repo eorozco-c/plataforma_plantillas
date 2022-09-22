@@ -2,6 +2,7 @@ from django.conf import settings
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.db.models import Q
 from .models import Datos, NotasDatos
 from apps.plantillas.models import Plantilla
 from apps.parametros.models import Parametro
@@ -178,21 +179,21 @@ def generar_informe(request, pk_plantilla):
                 #obtain all valores from datos when parametro contains "conductividad"
                 conductividad = datos.filter(parametro__nombre__icontains="conductividad")
                 #count all puntos_medicion from conductividad when nombre contains "caldera"
-                calderas = conductividad.filter(punto_medicion__nombre__icontains="caldera")
+                calderas = conductividad.filter(Q(punto_medicion__nombre__icontains="caldera") | Q(punto_medicion__nombre__icontains="autoclave"))
                 alimentacion = conductividad.get(punto_medicion__nombre__icontains="alimentacion")
                 factor_conductividad = {"name": "Factor de conductividad", "data": []}
                 for caldera in calderas:
                     factor_conductividad["data"].append({"name": caldera.punto_medicion.nombre, "valor": round(caldera.valor/alimentacion.valor, 2)})
                 json_data.append(factor_conductividad)
                 cloruros = datos.filter(parametro__nombre__icontains="cloruros")
-                calderas = cloruros.filter(punto_medicion__nombre__icontains="caldera")
+                calderas = cloruros.filter(Q(punto_medicion__nombre__icontains="caldera") | Q(punto_medicion__nombre__icontains="autoclave"))
                 alimentacion = cloruros.get(punto_medicion__nombre__icontains="alimentacion")
                 factor_clorus = {"name": "Factor de cloruros", "data": []}
                 for caldera in calderas:
                     factor_clorus["data"].append({"name": caldera.punto_medicion.nombre, "valor": round(caldera.valor/alimentacion.valor, 2)})
                 json_data.append(factor_clorus)
                 silice = datos.filter(parametro__nombre__icontains="silice")
-                calderas = silice.filter(punto_medicion__nombre__icontains="caldera")
+                calderas = silice.filter(Q(punto_medicion__nombre__icontains="caldera") | Q(punto_medicion__nombre__icontains="autoclave"))
                 alimentacion = silice.get(punto_medicion__nombre__icontains="alimentacion")
                 factor_silice = {"name": "Factor de silice", "data": []}
                 for caldera in calderas:
@@ -219,7 +220,7 @@ def generar_informe(request, pk_plantilla):
                     fc_conductividad["data"][1]["data"].append({"name": valor["name"], "valor": round(valor["valor"]*alimentacion_hierro.valor, 2)})
                     #multiplicate valor of factor_conductividad by valor of alimentacion_silice and append to fc_conductividad
                     fc_conductividad["data"][2]["data"].append({"name": valor["name"], "valor": round(valor["valor"]*alimentacion_silice.valor, 2)})
-                dureza_caldera = dureza_total.filter(punto_medicion__nombre__icontains="caldera")
+                dureza_caldera = dureza_total.filter(Q(punto_medicion__nombre__icontains="caldera") | Q(punto_medicion__nombre__icontains="autoclave"))
                 #iterate valor of dureza_caldera
                 for valor_dureza in dureza_caldera:
                     # print(valor_dureza.punto_medicion.nombre, valor_dureza.valor)
@@ -234,7 +235,7 @@ def generar_informe(request, pk_plantilla):
                                         fc_valor["status"] = "ok"
                                     else:
                                         fc_valor["status"] = "alerta"
-                hierro_caldera = hierro.filter(punto_medicion__nombre__icontains="caldera")
+                hierro_caldera = hierro.filter(Q(punto_medicion__nombre__icontains="caldera") | Q(punto_medicion__nombre__icontains="autoclave"))
                 #iterate valor of hierro_caldera
                 for valor_hierro in hierro_caldera:
                     # print(valor_hierro.punto_medicion.nombre, valor_hierro.valor)
@@ -249,7 +250,7 @@ def generar_informe(request, pk_plantilla):
                                         fc_valor["status"] = "ok"
                                     else:
                                         fc_valor["status"] = "alerta"
-                silice_caldera = silice.filter(punto_medicion__nombre__icontains="caldera")
+                silice_caldera = silice.filter(Q(punto_medicion__nombre__icontains="caldera") | Q(punto_medicion__nombre__icontains="autoclave"))
                 #iterate valor of silice_caldera
                 for valor_silice in silice_caldera:
                     # print(valor_silice.punto_medicion.nombre, valor_silice.valor)

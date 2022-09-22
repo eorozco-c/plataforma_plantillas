@@ -18,8 +18,8 @@ class FormularioPlantilla(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.request = kwargs.pop("request")
         super().__init__(*args, **kwargs)
-        element_exist = TipoPlantilla.objects.filter(plantillas_tipo__empresa=self.request.user.empresa)
-        self.fields['tipo'].queryset = TipoPlantilla.objects.exclude(id__in=element_exist)
+        # element_exist = TipoPlantilla.objects.filter(plantillas_tipo__empresa=self.request.user.empresa)
+        # self.fields['tipo'].queryset = TipoPlantilla.objects.exclude(id__in=element_exist)
         self.helper = FormHelper()
         self.helper.layout = Layout(
             *self.fields,
