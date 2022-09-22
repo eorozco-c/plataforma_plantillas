@@ -358,3 +358,15 @@ def generar_informe(request, pk_plantilla):
             # return HttpResponse(pdf, content_type='application/pdf')
     else:
         return redirect('plantillas:index')
+
+
+def borrar_fecha(request, pk_plantilla):
+    if request.method == 'POST':
+        fecha = request.POST.get('fecha')
+        fecha = datetime.strptime(fecha, '%Y-%m-%d')
+        datos = Datos.objects.filter(fecha=fecha, plantilla=pk_plantilla)
+        for dato in datos:
+            dato.delete()
+        return JsonResponse({'status': 'ok'})
+    else:
+        return JsonResponse({'status': 'error'})

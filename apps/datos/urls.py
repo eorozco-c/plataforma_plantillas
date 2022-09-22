@@ -9,4 +9,5 @@ urlpatterns = [
     path('get_datos/<int:pk_plantilla>/', views.get_datos, name="get_datos"),
     path('agregar_nota/<int:pk_plantilla>/', views.agregar_nota, name="agregar_nota"),
     path('borrar_nota/<int:pk_nota>/', views.borrar_nota, name="borrar_nota"),
+    path('borrar_fecha/<int:pk_plantilla>/', views.borrar_fecha, name="borrar_fecha"),
 ]

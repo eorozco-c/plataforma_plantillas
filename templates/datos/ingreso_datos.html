@@ -90,7 +90,10 @@
                 <div class="overflow-auto" style="height: 200px;">
                     <ul>
                         {% for fecha in fechas_existentes %}
-                        <li class="text-right">{{fecha.fecha}}</li>
+                        <li class="text-right mb-1" id="{{fecha.fecha|date:'Y-m-d'}}">{{fecha.fecha}} <a href=""
+                                elem="{{fecha.fecha|date:'Y-m-d'}}"
+                                class="badge bg-danger text-decoration-none text-light fechas_existentes">Eliminar</a>
+                        </li>
                         {% endfor %}
                     </ul>
                 </div>
@@ -168,7 +171,6 @@
                 fecha: $('#fecha').val()
             },
             success: function (data) {
-                console.log(data);
                 $('#notas').append('<li id=' + data.id + '>' + data.nota +
                     '- <a href="/datos/borrar_nota/' + data.id +
                     '"> <small>Eliminar</small></a> </li>'
@@ -177,6 +179,27 @@
             }
         });
         $('#text_notas').val('');
+    });
+
+    //if the user click on the button in class fechas_existentes, delete the fecha via post
+    $('.fechas_existentes').click(function () {
+        //prevent default
+        event.preventDefault();
+        var fecha = $(this).attr('elem');
+        $.ajax({
+            url: '{% url "datos:borrar_fecha" pk_plantilla=plantilla.id %}',
+            type: 'POST',
+            data: {
+                fecha: fecha,
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function (data) {
+                //if status is ok remove the li
+                if (data.status == 'ok') {
+                    $('#' + fecha).remove();
+                }
+            }
+        });
     });
 </script>
 {% endblock javascript %}
