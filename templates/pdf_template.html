@@ -187,6 +187,29 @@
         </table>
 
         {% endif %}
+        {% comment %} <div class="m-3">
+            <!--tittle limites in center-->
+            <h3 class="text-center">Límites de operación</h3>
+            <table class="table w-50 mx-auto">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Punto de medición</th>
+                        <th>Parámetro</th>
+                        <th>Limite</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for limite in limites  %}
+                    <tr>
+                        <td>{{limite.punto_medicion}}</td>
+                        <td>{{limite.parametro}}</td>
+                        <td>{{limite.limite}}</td>
+                    </tr>
+                    {% endfor %}
+
+                </tbody>
+            </table>
+        </div> {% endcomment %}
 
         <div id="notas">
             <div id="form_notas">
@@ -240,7 +263,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@3.8.2/dist/chart.min.js"></script>
 <script>
     var datos_json = JSON.parse('{{ datos_json|safe }}');
-    //console.log(datos_json)
+    console.log(datos_json)
     //crear multiple graficos de barra 
     //iterar sobre los elementos del json
     for (var key in datos_json) {
@@ -256,29 +279,42 @@
                         return e.fecha
                     }),
                     datasets: [{
-                        label: datos_json[key][i].punto,
-                        data: datos_json[key][i].data.map(function (e) {
-                            return e.valor
-                        }),
-                        backgroundColor: [
-                            'rgba(255, 99, 132, 1)',
-                            'rgba(54, 162, 235, 1)',
-                            'rgba(255, 206, 86, 1)',
-                            'rgba(75, 192, 192, 1)',
-                            'rgba(153, 102, 255, 1)',
-                            'rgba(255, 159, 64, 1)'
-                        ],
-                        borderColor: [
-                            'rgba(255, 99, 132, 1)',
-                            'rgba(54, 162, 235, 1)',
-                            'rgba(255, 206, 86, 1)',
-                            'rgba(75, 192, 192, 1)',
-                            'rgba(153, 102, 255, 1)',
-                            'rgba(255, 159, 64, 1)'
-                        ],
+                            label: datos_json[key][i].punto,
+                            data: datos_json[key][i].data.map(function (e) {
+                                return e.valor
+                            }),
+                            backgroundColor: [
+                                'rgba(54, 162, 235, 1)',
+                                'rgba(255, 99, 132, 1)',
+                                'rgba(255, 206, 86, 1)',
+                                'rgba(75, 192, 192, 1)',
+                                'rgba(153, 102, 255, 1)',
+                                'rgba(255, 159, 64, 1)'
+                            ],
+                            borderColor: [
+                                'rgba(54, 162, 235, 1)',
+                                'rgba(255, 99, 132, 1)',
+                                'rgba(255, 206, 86, 1)',
+                                'rgba(75, 192, 192, 1)',
+                                'rgba(153, 102, 255, 1)',
+                                'rgba(255, 159, 64, 1)'
+                            ],
 
-                        borderWidth: 1
-                    }]
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Límite',
+                            data: datos_json[key][i].data.map(function (e) {
+                                return datos_json[key][i].limite
+                            }),
+                            backgroundColor: [
+                                'rgba(255, 99, 132, 0.2)',
+                            ],
+                            borderColor: [
+                                'rgba(255, 99, 132, 1)',
+                            ],
+                        }
+                    ]
                 },
 
             });

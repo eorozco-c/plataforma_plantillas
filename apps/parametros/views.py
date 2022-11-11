@@ -1,11 +1,12 @@
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 from django.views.generic.edit import CreateView, UpdateView
 from django.views.generic.list import ListView
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.urls import reverse_lazy
-from .models import Parametro
+from .models import Parametro, Limite
 from .formularios import FormularioParametros
+from apps.puntos_medicion.models import PuntoMedicion
 from django.http.response import JsonResponse
 
 # Create your views here.
@@ -82,4 +83,44 @@ def destroy(request,pk):
             except:
                 return redirect("parametros:index")
             parametro.delete()
+    return redirect("parametros:index")
+
+#add template that add limite to parametro and punto_medicion
+@login_required(login_url="/")
+def agregar_limite(request, pk):
+    if request.method == "GET":
+        if request.user.is_staff:
+            try:
+                parametro = Parametro.objects.get(id=pk)
+            except:
+                return redirect("parametros:index")
+            puntos_medicion = PuntoMedicion.objects.filter(empresa=request.user.empresa)
+            #limite by punto_medicion
+            limites = Limite.objects.filter(parametro=parametro)
+            context={
+                'parametro': parametro,
+                'puntos_medicion': puntos_medicion,
+                'limites': limites,
+                'appname': "parámetros",
+            }
+            return render(request, "parametros/parametros_limite.html", context)
+    elif request.method == "POST":
+        if request.user.is_staff:
+            try:
+                parametro = Parametro.objects.get(id=pk)
+                punto_medicion = PuntoMedicion.objects.get(id=request.POST['punto_medicion'])
+            except:
+                return redirect("parametros:index")
+            limite = request.POST['limite']
+            if limite == "":
+                limite = None
+            #if exist limite for this parametro and punto_medicion update it else create new
+            valor = Limite.objects.filter(parametro=parametro, punto_medicion=punto_medicion)
+            if valor:
+                valor = valor[0]
+                valor.limite = limite
+                valor.save()
+            else:
+                Limite.objects.create(parametro=parametro, punto_medicion=punto_medicion, limite=limite)
+            return redirect("parametros:agregar_limite", pk=pk)
     return redirect("parametros:index")

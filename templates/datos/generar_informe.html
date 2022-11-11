@@ -50,6 +50,11 @@
 
                                             {% endfor %}
                                         </div>
+                                        <div class="mt-4">
+                                            <input class="form-check-input" type="checkbox" id="check_all_parametros"
+                                                name="check_all_parametros" value="check_all_parametros">
+                                            <label for="check_all_parametros">Seleccionar todos los parametros</label>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -67,6 +72,11 @@
 
                                             {% endfor %}
                                         </div>
+                                        <div class="mt-4">
+                                            <input class="form-check-input" type="checkbox" id="check_all_puntos"
+                                                name="check_all_puntos" value="check_all_puntos">
+                                            <label for="check_all_puntos">Seleccionar todos los puntos</label>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -75,14 +85,16 @@
                     <div class="col-md-6  border-left">
                         <h3 class="text-right">Fechas existentes</h3>
                         <div class="overflow-auto" style="height: 200px;">
-                            <ul>
+                            <ul id="fechas_existentes">
                                 {% for fecha in fechas_existentes %}
-                                <li class="text-right">{{fecha.fecha}}</li>
+                                <li class="text-right" id="{{fecha.fecha|date:'Y-m-d'}}">{{fecha.fecha}}</li>
                                 {% endfor %}
                             </ul>
                         </div>
                     </div>
                 </div>
+                <!--add check that check all type="checkbox"-->
+
                 <button type="submit" class="btn btn-primary">Generar informe</button>
             </div>
 
@@ -123,5 +135,28 @@
             }
         });
     });
+
+    //check all parametros
+    $("#check_all_parametros").click(function () {
+        if ($(this).is(':checked')) {
+            $("#check_parametros input").prop('checked', true);
+        } else {
+            $("#check_parametros input").prop('checked', false);
+        }
+    });
+
+    //check all puntos
+    $("#check_all_puntos").click(function () {
+        if ($(this).is(':checked')) {
+            $("#check_puntos input").prop('checked', true);
+        } else {
+            $("#check_puntos input").prop('checked', false);
+        }
+    });
+
+    //fecha_ini use first fechas_existentes
+    //convert to date 9 de Noviembre de 2022 to 2022-11-09
+    var fecha_ini = $("#fechas_existentes li:first-child").attr("id");
+    $("#fecha_ini").val(fecha_ini);
 </script>
 {% endblock javascript %}

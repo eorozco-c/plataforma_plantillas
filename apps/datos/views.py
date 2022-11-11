@@ -5,14 +5,12 @@ from django.contrib import messages
 from django.db.models import Q
 from .models import Datos, NotasDatos
 from apps.plantillas.models import Plantilla
-from apps.parametros.models import Parametro
+from apps.parametros.models import Parametro, Limite
 from apps.puntos_medicion.models import PuntoMedicion
 from datetime import datetime
-from apps.utils import html_to_pdf
-from django.http import HttpResponse,JsonResponse
-from django.template.loader import render_to_string
-import matplotlib.pyplot as plt
-import os,json
+from django.http import JsonResponse
+
+import json
 
 ##############################################################################
 @login_required(login_url='/')
@@ -94,13 +92,13 @@ def ingreso_datos(request, pk_plantilla,get_fecha=None):
         #request.post csrf_token + punto_medicion.id_parametro.id_parametro destructured
         fecha_dato = request.POST['fecha']
         for values in request.POST:
+            # print(values)
             #skip ['csrfmiddlewaretoken'] and ['']
-            if 'csrfmiddlewaretoken' not in values and 'fecha' not in values:
+            if 'csrfmiddlewaretoken' not in values and 'fecha' not in values and 'text_notas' not in values:
                 #separate id_parametro and id_punto_medicion by underscore
                 list = values.split("_")
                 id_punto_medicion = list[0]
                 id_parametro  = list[1]
-                # print(id_punto_medicion, id_parametro)
                 #get id_punto_medicion and id_parametro
                 punto_medicion = PuntoMedicion.objects.get(id=id_punto_medicion)
                 parametro = Parametro.objects.get(id=id_parametro)
@@ -318,11 +316,19 @@ def generar_informe(request, pk_plantilla):
 
                         punto = PuntoMedicion.objects.get(pk=punto)
                         datos_n = Datos.objects.filter(punto_medicion=punto, parametro=parametro, fecha__range=[fecha_ini, fecha_fin],plantilla=plantilla)
+                        try:
+                            limite = Limite.objects.get(parametro=parametro, punto_medicion=punto)
+                            if limite == None or limite == "":
+                                limite = "0"
+                        except:
+                            limite = "0"
+                        limite = str(limite)
                         #order by fecha asc
                         datos_n = datos_n.order_by('fecha')
                         datos_json[parametro.id].append({
                             'id' : punto.id,
                             'punto' : punto.nombre,
+                            'limite' : limite,
                             'data' : [],
                         })
                         #append to punto.nombre  dato.fecha and dato.valor to datos_json
@@ -332,10 +338,13 @@ def generar_informe(request, pk_plantilla):
                                 'valor' : dato.valor,
                             })
                 datos_json = json.dumps(datos_json)
+                # print(datos_json)
             except:
                 messages
             #send json data
             notas = NotasDatos.objects.filter(plantilla=plantilla, fecha=fecha_ini_tabla)
+            #obtain limite when parametro is tipo caldera
+            limites = Limite.objects.filter(parametro__tipo=plantilla.tipo, punto_medicion__empresa=request.user.empresa) 
             context = {
                 "plantilla": plantilla,
                 "parametros": parametros,
@@ -351,6 +360,7 @@ def generar_informe(request, pk_plantilla):
                 "user": request.user,
                 "notas": notas,
                 "datos_json": datos_json,
+                "limites": limites,
             }
             #print(json_data)
             return render(request, "pdf_template.html", context)

@@ -9,4 +9,5 @@ urlpatterns = [
     path('editar/<int:pk>/', views.EditParametros.as_view(), name="editar"),
     path('predestroy/<int:pk>/', views.predestroy, name="predestroy"),
     path('destroy/<int:pk>/', views.destroy, name="destroy"),
+    path('agregar_limite/<int:pk>/', views.agregar_limite, name="agregar_limite"),
 ]

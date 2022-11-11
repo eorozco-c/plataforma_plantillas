@@ -3,42 +3,38 @@
 {% block contenido%}
 <!-- Page Heading -->
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
-    <a href="{% url 'master:index' %}" class="align-self-center ms-2 mb-1 btn btn-primary text-light border"><i
-            class="far fa-arrow-alt-circle-left"></i> Volver al
-        menú</a>
+    <a href="{% url 'parametros:index' %}" class="align-self-center ms-2 mb-1 btn btn-primary text-light border"><i
+            class="far fa-arrow-alt-circle-left"></i> Volver atrás</a>
     <a href="{% url 'parametros:agregar' %}" class="align-self-center ms-2 mb-1 btn btn-success text-light border"><i
             class="fas fa-plus-circle"></i> Agregar Parámetro</a>
 </div>
 <div class="table-responsive mt-3">
+    <h3>{{parametro}}</h3>
     <table id="tabla_base" class="table table-striped table-hover table-borderless" style="width:100%">
         <thead class="table-dark">
             <tr>
-                <th>Nombre</th>
-                <th>Unidad</th>
-                <th>Descripción</th>
-                <th>Tipo</th>
-                <th>Acciones</th>
+                <th>Punto</th>
+                <th>Limite</th>
             </tr>
         </thead>
         <tbody>
-            {% for parametro in object_list %}
+            <!--add form with all puntos_medicion with only one button submit-->
+            {% for punto in puntos_medicion %}
             <tr>
-                <td>{{parametro.nombre}}</td>
-                <td>{{parametro.abreviado}}</td>
-                <td>{{parametro.descripcion}}</td>
-                <td>{{parametro.tipo}}</td>
+                <td>{{punto}}</td>
                 <td>
-                    <a href="{% url 'parametros:agregar_limite' parametro.id %}" class="btn btn-warning btn-sm"><i
-                            class="fas fa-wrench"></i> Agregar Limites</a>
-                    <a class="btn btn-primary btn-sm text-light border border-dark m-1"
-                        href="{% url 'parametros:editar' pk=parametro.id %}" id="edit"><i class="fas fa-edit"></i></a>
-                    <a class="open-modal btn btn-danger btn-sm text-light border border-dark m-1" data-bs-toggle="modal"
-                        data-bs-target="#modal" data-popup-url="{% url 'parametros:predestroy' pk=parametro.id %}"
-                        href="">
-                        <i class="fas fa-trash"></i> </a>
+                    <form action="{% url 'parametros:agregar_limite' pk=parametro.pk %}" method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="punto_medicion" value="{{punto.id}}">
+                        <input type="hidden" name="parametro" value="{{parametro.id}}">
+                        <input type="number" id="limite_{{punto.id}}" name="limite" class="form-control"
+                            placeholder="Limite">
+                        <button type="submit" class="btn btn-success mt-2">Agregar</button>
+                    </form>
                 </td>
             </tr>
             {% endfor %}
+
         </tbody>
     </table>
 </div>
@@ -93,5 +89,13 @@
                 $(".modal-body").empty();
         });
     });
+
+    //from {{limites}} set values to number when puntos.id is equal to limites.punto_medicion
+    '{% for limite in limites %}'
+    var inputName = '#limite_{{limite.punto_medicion.id}}';
+    //convert to number type  number
+    var value = parseFloat('{{limite.limite}}');
+    $(inputName).val(value);
+    '{% endfor %}'
 </script>
 {% endblock javascript %}
